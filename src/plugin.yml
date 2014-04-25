@@ -1,0 +1,6 @@
+name: SkinsRestorer
+main: skinsrestorer.SkinsRestorer
+version: 1.0
+author: _Shevchik_
+depend: [ProtocolLib]
+load: startup
