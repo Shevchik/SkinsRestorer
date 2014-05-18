@@ -4,9 +4,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.util.com.mojang.authlib.properties.Property;
+
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import skinsrestorer.PropResult.Prop;
@@ -26,9 +28,6 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		if (skins.containsKey(name.toLowerCase())) {
-			return;
-		}
 		Profile prof = Utils.getProfile(name);
 		if (prof == null) {
 			return;
@@ -39,6 +38,11 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		}
 		Property nmsprop = new Property(prop.name, prop.value, prop.signature);
 		skins.put(name.toLowerCase(), new SkinProfile(UUID.fromString(Utils.getUUIDString(prof.getId())), nmsprop));
+	}
+
+	@EventHandler
+	public void onQuit(PlayerQuitEvent event) {
+		skins.remove(event.getPlayer().getName().toLowerCase());
 	}
 
 	@Override
