@@ -41,6 +41,7 @@ public class BasicHttpClient implements HttpClient {
             connection.setRequestProperty(header.getName(), header.getValue());
         }
 
+        connection.setConnectTimeout(7000);
         connection.setUseCaches(false);
         connection.setDoInput(true);
         connection.setDoOutput(true);

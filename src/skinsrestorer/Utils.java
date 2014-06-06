@@ -3,6 +3,7 @@ package skinsrestorer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 
 import net.minecraft.util.com.google.gson.Gson;
 import net.minecraft.util.org.apache.commons.io.IOUtils;
@@ -48,10 +49,13 @@ public class Utils {
 	public static Prop getProp(String id) {
 		try {
 			URL url = new URL(skullbloburl+id);
-			InputStream is = url.openStream();
+			URLConnection connection = url.openConnection();
+			connection.setConnectTimeout(7000);
+			InputStream is = connection.getInputStream();
 			String result = IOUtils.toString(is, Charsets.UTF_8);
 			Gson gson = new Gson();
 			PropResult propr = gson.fromJson(result, PropResult.class);
+			is.close();
 			if (!propr.properties.isEmpty()) {
 				return propr.properties.get(0);
 			}
