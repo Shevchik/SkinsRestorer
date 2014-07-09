@@ -45,6 +45,9 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		if (true) {
+			return;
+		}
 		getServer().getPluginManager().registerEvents(this, this);
 		ProtocolLibrary.getProtocolManager().addPacketListener(
 			new PacketAdapter(
