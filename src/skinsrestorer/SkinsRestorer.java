@@ -1,11 +1,9 @@
 package skinsrestorer;
 
-import java.lang.reflect.Field;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
+import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,6 +16,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.mojang.api.profiles.Profile;
 
 public class SkinsRestorer extends JavaPlugin implements Listener {
@@ -35,7 +34,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		if (prop == null) {
 			return;
 		}
-		skins.put(name.toLowerCase(), new SkinProfile(UUID.fromString(Utils.getUUIDString(prof.getId())), prop));
+		skins.put(name.toLowerCase(), new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop));
 	}
 
 	@EventHandler
@@ -45,9 +44,6 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
-		if (true) {
-			return;
-		}
 		getServer().getPluginManager().registerEvents(this, this);
 		ProtocolLibrary.getProtocolManager().addPacketListener(
 			new PacketAdapter(
@@ -59,16 +55,11 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 					String name = origprofile.getName();
 					if (skins.containsKey(name.toLowerCase())) {
 						SkinProfile skinprofile = skins.get(name.toLowerCase());
-						Object packet = event.getPacket().getHandle();
-						try {
-							GameProfile profile = new GameProfile(skinprofile.getUUID(), name);
-							profile.getProperties().put(skinprofile.getProperty().getName(), skinprofile.getProperty());
-							Field gameProfileField = packet.getClass().getDeclaredField("b");
-							gameProfileField.setAccessible(true);
-							gameProfileField.set(packet, profile);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						WrappedGameProfile newprofile = new WrappedGameProfile(skinprofile.getUUID(), origprofile.getName());
+						WrappedSignedProperty wprop = WrappedSignedProperty.fromHandle(skinprofile.getProperty());
+						newprofile.getProperties().clear();
+						newprofile.getProperties().put(skinprofile.getProperty().getName(), wprop);
+						event.getPacket().getGameProfiles().write(0, newprofile);
 					}
 				}
 			}
