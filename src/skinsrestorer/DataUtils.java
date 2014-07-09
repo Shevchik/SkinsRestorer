@@ -15,7 +15,7 @@ import com.google.common.base.Charsets;
 import com.mojang.api.profiles.HttpProfileRepository;
 import com.mojang.api.profiles.Profile;
 
-public class Utils {
+public class DataUtils {
 
 	public static Profile getProfile(String nick) {
 		HttpProfileRepository repo = new HttpProfileRepository("minecraft");
@@ -36,7 +36,6 @@ public class Utils {
 			connection.setUseCaches(false);
 			InputStream is = connection.getInputStream();
 			String result = IOUtils.toString(is, Charsets.UTF_8);
-			System.out.println(result);
 			IOUtils.closeQuietly(is);
 			JSONArray properties = (JSONArray) ((JSONObject) new JSONParser().parse(result)).get("properties");
 			for (int i = 0; i < properties.size(); i++) {

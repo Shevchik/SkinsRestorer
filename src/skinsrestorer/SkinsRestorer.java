@@ -8,7 +8,6 @@ import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comphenix.protocol.PacketType;
@@ -26,20 +25,18 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		Profile prof = Utils.getProfile(name);
+		if (skins.containsKey(name.toLowerCase())) {
+			return;
+		}
+		Profile prof = DataUtils.getProfile(name);
 		if (prof == null) {
 			return;
 		}
-		Property prop = Utils.getProp(prof.getId());
+		Property prop = DataUtils.getProp(prof.getId());
 		if (prop == null) {
 			return;
 		}
 		skins.put(name.toLowerCase(), new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop));
-	}
-
-	@EventHandler
-	public void onQuit(PlayerQuitEvent event) {
-		skins.remove(event.getPlayer().getName().toLowerCase());
 	}
 
 	@Override
