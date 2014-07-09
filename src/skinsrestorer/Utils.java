@@ -4,12 +4,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import net.minecraft.util.com.mojang.authlib.properties.Property;
+import net.minecraft.util.org.apache.commons.io.IOUtils;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-import net.minecraft.util.com.mojang.authlib.properties.Property;
-import net.minecraft.util.org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Charsets;
 import com.mojang.api.profiles.HttpProfileRepository;
@@ -45,7 +45,7 @@ public class Utils {
 				String value = (String) property.get("value");
 				String signature = (String) property.get("signature");
 				if (name.equals("textures")) {
-				return new Property(name, value, signature);
+					return new Property(name, value, signature);
 				}
 			}
 		} catch (Exception e) {
