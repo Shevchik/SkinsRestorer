@@ -59,7 +59,7 @@ public class Utils {
 			if (!propr.properties.isEmpty()) {
 				return propr.properties.get(0);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 		}
 		return null;
 	}
