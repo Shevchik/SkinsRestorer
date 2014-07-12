@@ -2,14 +2,14 @@ package com.mojang.api.http;
 
 public class HttpBody {
 
-    private String bodyString;
+	private String bodyString;
 
-    public HttpBody(String bodyString) {
-        this.bodyString = bodyString;
-    }
+	public HttpBody(String bodyString) {
+		this.bodyString = bodyString;
+	}
 
-    public byte[] getBytes() {
-        return bodyString != null ? bodyString.getBytes() : new byte[0];
-    }
+	public byte[] getBytes() {
+		return bodyString != null ? bodyString.getBytes() : new byte[0];
+	}
 
 }
