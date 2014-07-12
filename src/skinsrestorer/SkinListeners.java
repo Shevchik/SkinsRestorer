@@ -33,12 +33,18 @@ public class SkinListeners implements Listener {
 
 	//map to hold skin data
 	private ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();
+	private boolean hasLoadedSkinData(String name) {
+		return skins.containsKey(name.toLowerCase());
+	}
+	private SkinProfile getLoadedSkinData(String name) {
+		return skins.get(name.toLowerCase());
+	}
 
 	//load skin data on async prelogin event
 	@EventHandler
 	public void onPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		if (skins.containsKey(name.toLowerCase())) {
+		if (hasLoadedSkinData(name) && !getLoadedSkinData(name).isTooDamnOld()) {
 			return;
 		}
 		Profile prof = DataUtils.getProfile(name);
@@ -67,8 +73,8 @@ public class SkinListeners implements Listener {
 				public void onPacketSending(PacketEvent event) {
 					WrappedGameProfile origprofile = event.getPacket().getGameProfiles().getValues().get(0);
 					String name = origprofile.getName();
-					if (skins.containsKey(name.toLowerCase())) {
-						SkinProfile skinprofile = skins.get(name.toLowerCase());
+					if (hasLoadedSkinData(name)) {
+						SkinProfile skinprofile = getLoadedSkinData(name);
 						WrappedGameProfile newprofile = new WrappedGameProfile(skinprofile.getUUID(), origprofile.getName());
 						WrappedSignedProperty wprop = WrappedSignedProperty.fromHandle(skinprofile.getPlayerSkinData());
 						newprofile.getProperties().clear();
@@ -91,8 +97,8 @@ public class SkinListeners implements Listener {
 					meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
 				}
 				String name = meta.getOwner();
-				if (skins.containsKey(name.toLowerCase())) {
-					SkinProfile skinprofile = skins.get(name.toLowerCase());
+				if (hasLoadedSkinData(name)) {
+					SkinProfile skinprofile = getLoadedSkinData(name);
 					GameProfile newprofile = new GameProfile(skinprofile.getUUID(), name);
 					newprofile.getProperties().clear();
 					newprofile.getProperties().put(skinprofile.getHeadSkinData().getName(), skinprofile.getHeadSkinData());

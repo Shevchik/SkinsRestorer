@@ -13,12 +13,18 @@ import org.json.simple.parser.ParseException;
 public class SkinProfile {
 
 	private UUID uuid;
+	private long timestamp;
 	private Property playerSkinData;
 	private Property headSkinData;
 	public SkinProfile(UUID uuid, Property skinData) throws ParseException {
 		this.uuid = uuid;
+		this.timestamp = System.currentTimeMillis();
 		this.playerSkinData = skinData;
 		this.headSkinData = recodePlayerSkinDataToHeadSkinData(skinData);
+	}
+
+	public boolean isTooDamnOld() {
+		return System.currentTimeMillis() - timestamp > 60*60*1000;
 	}
 
 	public UUID getUUID() {
