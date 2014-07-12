@@ -60,24 +60,24 @@ public class SkinListeners implements Listener {
 	//fix player skin data on named entity spawn packet
 	public void registerPlayerSkinListener() {
 		ProtocolLibrary.getProtocolManager().addPacketListener(
-				new PacketAdapter(
-					PacketAdapter.params(plugin, PacketType.Play.Server.NAMED_ENTITY_SPAWN)
-				) {
-					@Override
-					public void onPacketSending(PacketEvent event) {
-						WrappedGameProfile origprofile = event.getPacket().getGameProfiles().getValues().get(0);
-						String name = origprofile.getName();
-						if (skins.containsKey(name.toLowerCase())) {
-							SkinProfile skinprofile = skins.get(name.toLowerCase());
-							WrappedGameProfile newprofile = new WrappedGameProfile(skinprofile.getUUID(), origprofile.getName());
-							WrappedSignedProperty wprop = WrappedSignedProperty.fromHandle(skinprofile.getPlayerSkinData());
-							newprofile.getProperties().clear();
-							newprofile.getProperties().put(skinprofile.getPlayerSkinData().getName(), wprop);
-							event.getPacket().getGameProfiles().write(0, newprofile);
-						}
+			new PacketAdapter(
+				PacketAdapter.params(plugin, PacketType.Play.Server.NAMED_ENTITY_SPAWN)
+			) {
+				@Override
+				public void onPacketSending(PacketEvent event) {
+					WrappedGameProfile origprofile = event.getPacket().getGameProfiles().getValues().get(0);
+					String name = origprofile.getName();
+					if (skins.containsKey(name.toLowerCase())) {
+						SkinProfile skinprofile = skins.get(name.toLowerCase());
+						WrappedGameProfile newprofile = new WrappedGameProfile(skinprofile.getUUID(), origprofile.getName());
+						WrappedSignedProperty wprop = WrappedSignedProperty.fromHandle(skinprofile.getPlayerSkinData());
+						newprofile.getProperties().clear();
+						newprofile.getProperties().put(skinprofile.getPlayerSkinData().getName(), wprop);
+						event.getPacket().getGameProfiles().write(0, newprofile);
 					}
 				}
-			);
+			}
+		);
 	}
 
 	//fix picked up skull game profile

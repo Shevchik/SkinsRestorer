@@ -2,13 +2,13 @@ package skinsrestorer;
 
 import java.util.UUID;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import net.minecraft.util.com.mojang.authlib.properties.Property;
 import net.minecraft.util.org.apache.commons.codec.Charsets;
 import net.minecraft.util.org.apache.commons.codec.binary.Base64;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class SkinProfile {
 
