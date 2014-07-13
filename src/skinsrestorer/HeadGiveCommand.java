@@ -66,15 +66,15 @@ public class HeadGiveCommand implements CommandExecutor {
 						final ItemStack playerhead = new ItemStack(Material.SKULL_ITEM);
 						playerhead.setDurability((short) 3);
 						String name = args[1];
-						Profile prof = DataUtils.getProfile(name);
-						if (prof == null) {
-							return;
-						}
-						Property prop = DataUtils.getProp(prof.getId());
-						if (prop == null) {
-							return;
-						}
 						try {
+							Profile prof = DataUtils.getProfile(name);
+							if (prof == null) {
+								throw new RuntimeException("Can't find a valid premium player with that name");
+							}
+							Property prop = DataUtils.getProp(prof.getId());
+							if (prop == null) {
+								throw new RuntimeException("No skin data found for player with that name");
+							}
 							SkullMeta meta = (SkullMeta) playerhead.getItemMeta();
 							if (meta == null) {
 								meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
