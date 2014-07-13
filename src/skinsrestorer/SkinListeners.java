@@ -28,6 +28,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
@@ -106,25 +107,39 @@ public class SkinListeners implements Listener {
 	//fix picked up skull game profile
 	@EventHandler
 	public void onPickupHead(PlayerPickupItemEvent event) {
+		ItemStack itemstack = event.getItem().getItemStack();
+		if (itemstack.getType() == Material.SKULL_ITEM && (itemstack.getDurability() == 3)) {
+			fixHeadSkin(itemstack);
+			event.getItem().setItemStack(itemstack);
+		}
+	}
+
+	//fix spawned head item game profile
+	@EventHandler
+	public void onHeadItemSpawn(ItemSpawnEvent event) {
+		ItemStack itemstack = event.getEntity().getItemStack();
+		if (itemstack.getType() == Material.SKULL_ITEM && (itemstack.getDurability() == 3)) {
+			fixHeadSkin(itemstack);
+			event.getEntity().setItemStack(itemstack);
+		}	
+	}
+
+	private void fixHeadSkin(ItemStack itemstack) {
 		try {
-			ItemStack itemstack = event.getItem().getItemStack();
-			if (itemstack.getType() == Material.SKULL_ITEM && (itemstack.getDurability() == 3)) {
-				SkullMeta meta = (SkullMeta) itemstack.getItemMeta();
-				if (meta == null) {
-					meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-				}
-				String name = meta.getOwner();
-				if (hasLoadedSkinData(name)) {
-					SkinProfile skinprofile = getLoadedSkinData(name);
-					GameProfile newprofile = new GameProfile(skinprofile.getUUID(), name);
-					newprofile.getProperties().clear();
-					newprofile.getProperties().put(skinprofile.getHeadSkinData().getName(), skinprofile.getHeadSkinData());
-					Field profileField = meta.getClass().getDeclaredField("profile");
-					profileField.setAccessible(true);
-					profileField.set(meta, newprofile);
-					itemstack.setItemMeta(meta);
-					event.getItem().setItemStack(itemstack);
-				}
+			SkullMeta meta = (SkullMeta) itemstack.getItemMeta();
+			if (meta == null) {
+				meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
+			}
+			String name = meta.getOwner();
+			if (hasLoadedSkinData(name)) {
+				SkinProfile skinprofile = getLoadedSkinData(name);
+				GameProfile newprofile = new GameProfile(skinprofile.getUUID(), name);
+				newprofile.getProperties().clear();
+				newprofile.getProperties().put(skinprofile.getHeadSkinData().getName(), skinprofile.getHeadSkinData());
+				Field profileField = meta.getClass().getDeclaredField("profile");
+				profileField.setAccessible(true);
+				profileField.set(meta, newprofile);
+				itemstack.setItemMeta(meta);
 			}
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
