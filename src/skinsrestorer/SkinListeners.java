@@ -18,6 +18,8 @@
 package skinsrestorer;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.util.com.mojang.authlib.GameProfile;
@@ -50,11 +52,25 @@ public class SkinListeners implements Listener {
 
 	//map to hold skin data
 	private ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();
-	private boolean hasLoadedSkinData(String name) {
+
+	public boolean hasLoadedSkinData(String name) {
 		return skins.containsKey(name.toLowerCase());
 	}
-	private SkinProfile getLoadedSkinData(String name) {
+
+	public void addSkinData(String name, SkinProfile data) {
+		skins.put(name.toLowerCase(), data);
+	}
+
+	public void removeSkinData(String name) {
+		skins.remove(name.toLowerCase());
+	}
+
+	public SkinProfile getLoadedSkinData(String name) {
 		return skins.get(name.toLowerCase());
+	}
+
+	public Map<String, SkinProfile> getSkinData() {
+		return Collections.unmodifiableMap(skins);
 	}
 
 	//load skin data on async prelogin event

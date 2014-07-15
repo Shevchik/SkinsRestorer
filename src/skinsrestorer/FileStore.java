@@ -17,22 +17,14 @@
 
 package skinsrestorer;
 
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
+public class FileStore {
 
-public class SkinsRestorer extends JavaPlugin implements Listener {
-
-	private SkinListeners listener;
-	public SkinListeners getListener() {
-		return listener;
+	public void loadData() {
+		
 	}
-	
-	@Override
-	public void onEnable() {
-		listener = new SkinListeners(this);
-		getServer().getPluginManager().registerEvents(listener, this);
-		listener.registerPlayerSkinListener();
-		getCommand("skinsrestorer").setExecutor(new HeadGiveCommand(this));
+
+	public void saveData() {
+		
 	}
 
 }

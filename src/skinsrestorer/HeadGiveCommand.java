@@ -87,6 +87,7 @@ public class HeadGiveCommand implements CommandExecutor {
 							profileField.setAccessible(true);
 							profileField.set(meta, newprofile);
 							playerhead.setItemMeta(meta);
+							plugin.getListener().addSkinData(name, skinprofile);
 						} catch (Exception e) {
 							player.sendMessage(ChatColor.RED + "Skin wasn't applied to head because of the error: "+e.getMessage());
 						}
