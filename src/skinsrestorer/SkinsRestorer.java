@@ -27,7 +27,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		return listener;
 	}
 
-	private FileStore storage = new FileStore();
+	private FileStore storage;
 
 	@Override
 	public void onEnable() {
@@ -35,6 +35,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(listener, this);
 		listener.registerPlayerSkinListener();
 		getCommand("skinsrestorer").setExecutor(new HeadGiveCommand(this));
+		storage = new FileStore(this);
 		storage.loadData();
 	}
 

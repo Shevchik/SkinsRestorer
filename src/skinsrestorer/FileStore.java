@@ -31,6 +31,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class FileStore {
 
 	private SkinsRestorer plugin;
+	public FileStore(SkinsRestorer plugin) {
+		this.plugin = plugin;
+	}
 
 	private int maxHeldSkinDataNumber = 200000;
 	private int maxDaysBeforeExpire = 30;
