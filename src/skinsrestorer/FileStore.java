@@ -17,14 +17,66 @@
 
 package skinsrestorer;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map.Entry;
+import java.util.UUID;
+
+import net.minecraft.util.com.mojang.authlib.properties.Property;
+
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 public class FileStore {
 
+	private SkinsRestorer plugin;
+
+	private int maxHeldSkinDataNumber = 200000;
+	private int maxDaysBeforeExpire = 30;
+
 	public void loadData() {
-		
+		int loadedSkins = 0;
+		File datafile = new File(plugin.getDataFolder(), "data.yml");
+		FileConfiguration data = YamlConfiguration.loadConfiguration(datafile);
+		ConfigurationSection cs = data.getConfigurationSection("");
+		if (cs == null) {
+			return;
+		}
+		for (String name : cs.getKeys(false)) {
+			if (loadedSkins >= maxHeldSkinDataNumber) {
+				return;
+			}
+			long creationDate = cs.getLong(name+".timestamp");
+			if (System.currentTimeMillis() - creationDate > maxDaysBeforeExpire * 24 * 60 * 60 * 1000);
+			String uuid = cs.getString(name+".uuid");
+			String propertyname = cs.getString(name+".propertyname");
+			String propertyvalue = cs.getString(name+".propertyvalue");
+			String propertysignature = cs.getString(name+".propertysignature");
+			try {
+				SkinProfile skinData = new SkinProfile(UUID.fromString(uuid), new Property(propertyname, propertyvalue, propertysignature));
+				plugin.getListener().addSkinData(name, skinData);
+				loadedSkins++;
+			} catch (Exception e) {
+			}
+		}
 	}
 
 	public void saveData() {
-		
+		File datafile = new File(plugin.getDataFolder(), "data.yml");
+		FileConfiguration data = new YamlConfiguration();
+		for (Entry<String, SkinProfile> entry : plugin.getListener().getSkinData().entrySet()) {
+			data.set(entry.getKey()+".uuid", entry.getValue().getUUID().toString());
+			data.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
+			data.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinData().getName());
+			data.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinData().getValue());
+			data.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinData().getSignature());
+		}
+		try {
+			data.save(datafile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
