@@ -51,7 +51,9 @@ public class FileStore {
 				return;
 			}
 			long creationDate = cs.getLong(name+".timestamp");
-			if (System.currentTimeMillis() - creationDate > maxDaysBeforeExpire * 24 * 60 * 60 * 1000);
+			if (System.currentTimeMillis() - creationDate > maxDaysBeforeExpire * 24 * 60 * 60 * 1000) {
+				return;
+			}
 			String uuid = cs.getString(name+".uuid");
 			String propertyname = cs.getString(name+".propertyname");
 			String propertyvalue = cs.getString(name+".propertyvalue");

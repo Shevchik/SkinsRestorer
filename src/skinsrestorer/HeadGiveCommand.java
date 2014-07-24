@@ -66,20 +66,24 @@ public class HeadGiveCommand implements CommandExecutor {
 						final ItemStack playerhead = new ItemStack(Material.SKULL_ITEM);
 						playerhead.setDurability((short) 3);
 						String name = args[1];
+						SkinProfile skinprofile = plugin.getListener().getLoadedSkinData(name);
 						try {
-							Profile prof = DataUtils.getProfile(name);
-							if (prof == null) {
-								throw new RuntimeException("Can't find a valid premium player with that name");
-							}
-							Property prop = DataUtils.getProp(prof.getId());
-							if (prop == null) {
-								throw new RuntimeException("No skin data found for player with that name");
-							}
 							SkullMeta meta = (SkullMeta) playerhead.getItemMeta();
 							if (meta == null) {
 								meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
 							}
-							SkinProfile skinprofile = new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop);
+							if (skinprofile == null) {
+								Profile prof = DataUtils.getProfile(name);
+								if (prof == null) {
+									throw new RuntimeException("Can't find a valid premium player with that name");
+								}
+								Property prop = DataUtils.getProp(prof.getId());
+								if (prop == null) {
+									throw new RuntimeException("No skin data found for player with that name");
+								}
+								skinprofile = new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop);
+								plugin.getListener().addSkinData(name, skinprofile);
+							}
 							GameProfile newprofile = new GameProfile(skinprofile.getUUID(), name);
 							newprofile.getProperties().clear();
 							newprofile.getProperties().put(skinprofile.getHeadSkinData().getName(), skinprofile.getHeadSkinData());
