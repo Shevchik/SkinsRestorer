@@ -57,7 +57,7 @@ public class FileStore {
 			String propertyvalue = cs.getString(name+".propertyvalue");
 			String propertysignature = cs.getString(name+".propertysignature");
 			try {
-				SkinProfile skinData = new SkinProfile(UUID.fromString(uuid), new Property(propertyname, propertyvalue, propertysignature));
+				SkinProfile skinData = new SkinProfile(UUID.fromString(uuid), new Property(propertyname, propertyvalue, propertysignature), creationDate);
 				plugin.getListener().addSkinData(name, skinData);
 				loadedSkins++;
 			} catch (Exception e) {
