@@ -37,7 +37,7 @@ public class DataUtils {
 	public static Profile getProfile(String nick) {
 		HttpProfileRepository repo = new HttpProfileRepository("minecraft");
 		Profile[] profiles = repo.findProfilesByNames(nick);
-		if (profiles.length == 1) {
+		if (profiles.length >= 1) {
 			return profiles[0];
 		}
 		return null;

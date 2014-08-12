@@ -34,7 +34,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		listener = new SkinListeners(this);
 		getServer().getPluginManager().registerEvents(listener, this);
 		listener.registerPlayerSkinListener();
-		getCommand("skinsrestorer").setExecutor(new HeadGiveCommand(this));
+		getCommand("skinsrestorer").setExecutor(new Commands(this));
 		storage = new FileStore(this);
 		storage.loadData();
 	}
