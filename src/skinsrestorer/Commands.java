@@ -123,10 +123,12 @@ public class Commands implements CommandExecutor {
 						Profile prof = DataUtils.getProfile(name);
 						if (prof == null) {
 							player.sendMessage(ChatColor.RED+"Can't find a valid premium player with that name");
+							return;
 						}
 						Property prop = DataUtils.getProp(prof.getId());
 						if (prop == null) {
 							player.sendMessage(ChatColor.RED+"No skin data found for player with that name");
+							return;
 						}
 						try {
 							SkinProfile skinprofile = new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop);
