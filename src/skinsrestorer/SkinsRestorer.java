@@ -37,6 +37,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		getCommand("skinsrestorer").setExecutor(new Commands(this));
 		storage = new FileStore(this);
 		storage.loadData();
+		new NPCScan(this).startScan();
 	}
 
 	@Override
