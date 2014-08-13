@@ -61,8 +61,8 @@ public class SkinStorage {
 		return Collections.unmodifiableMap(skins);
 	}
 
-	private int maxHeldSkinDataNumber = 200000;
-	private int maxDaysBeforeExpire = 30;
+	private long maxHeldSkinDataNumber = 200000;
+	private long maxDaysBeforeExpire = 30;
 
 	public void loadData() {
 		int loadedSkins = 0;
