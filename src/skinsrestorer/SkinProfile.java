@@ -36,18 +36,18 @@ public class SkinProfile {
 
 	public SkinProfile(UUID uuid, Property skinData) throws ParseException {
 		this.uuid = uuid;
-		this.timestamp = System.currentTimeMillis();
-		this.playerSkinData = skinData;
-		this.headSkinData = recodePlayerSkinDataToHeadSkinData(skinData);
+		timestamp = System.currentTimeMillis();
+		playerSkinData = skinData;
+		headSkinData = recodePlayerSkinDataToHeadSkinData(skinData);
 	}
 
 	public SkinProfile(UUID uuid, Property skinData, long creationTime) throws ParseException {
 		this(uuid, skinData);
-		this.timestamp = creationTime;
+		timestamp = creationTime;
 	}
 
 	public boolean isTooDamnOld() {
-		return System.currentTimeMillis() - timestamp > 24* 60 * 60 * 1000;
+		return (System.currentTimeMillis() - timestamp) > (24* 60 * 60 * 1000);
 	}
 
 	public long getCreationDate() {

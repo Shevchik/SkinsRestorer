@@ -58,7 +58,7 @@ public class Commands implements CommandExecutor {
 			return true;
 		}
 		final Player player = (Player) sender;
-		if (args.length == 2 && args[0].equalsIgnoreCase("head")) {
+		if ((args.length == 2) && args[0].equalsIgnoreCase("head")) {
 			player.sendMessage(ChatColor.BLUE + "Preparing head itemstack. Please wait.");
 			executor.execute(
 				new Runnable() {
@@ -96,7 +96,7 @@ public class Commands implements CommandExecutor {
 						} catch (Exception e) {
 							player.sendMessage(ChatColor.RED + "Skin wasn't applied to head because of the error: "+e.getMessage());
 						}
-						Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, 
+						Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,
 							new Runnable() {
 								@Override
 								public void run() {
@@ -110,11 +110,11 @@ public class Commands implements CommandExecutor {
 			);
 			return true;
 		} else
-		if (args.length == 2 && args[0].equalsIgnoreCase("drop")) {
+		if ((args.length == 2) && args[0].equalsIgnoreCase("drop")) {
 			plugin.getSkinStorage().removeSkinData(args[1]);
 			player.sendMessage(ChatColor.BLUE+"Skin data for player "+args[1]+" dropped");
 		} else
-		if (args.length == 2 && args[0].equalsIgnoreCase("update")) {
+		if ((args.length == 2) && args[0].equalsIgnoreCase("update")) {
 			executor.execute(
 				new Runnable() {
 					@Override

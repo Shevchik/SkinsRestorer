@@ -19,10 +19,10 @@ package skinsrestorer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map.Entry;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import net.minecraft.util.com.mojang.authlib.properties.Property;
@@ -77,7 +77,7 @@ public class SkinStorage {
 				return;
 			}
 			long creationDate = cs.getLong(name+".timestamp");
-			if (System.currentTimeMillis() - creationDate > maxDaysBeforeExpire * 24 * 60 * 60 * 1000) {
+			if ((System.currentTimeMillis() - creationDate) > (maxDaysBeforeExpire * 24 * 60 * 60 * 1000)) {
 				return;
 			}
 			String uuid = cs.getString(name+".uuid");

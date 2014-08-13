@@ -18,6 +18,7 @@
 package skinsrestorer;
 
 import java.lang.reflect.Field;
+
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
 import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
@@ -96,10 +97,10 @@ public class SkinListeners implements Listener {
 	@EventHandler
 	public void onHeadItemSpawn(ItemSpawnEvent event) {
 		ItemStack itemstack = event.getEntity().getItemStack();
-		if (itemstack.getType() == Material.SKULL_ITEM && (itemstack.getDurability() == 3)) {
+		if ((itemstack.getType() == Material.SKULL_ITEM) && (itemstack.getDurability() == 3)) {
 			fixHeadSkin(itemstack);
 			event.getEntity().setItemStack(itemstack);
-		}	
+		}
 	}
 
 	private void fixHeadSkin(ItemStack itemstack) {

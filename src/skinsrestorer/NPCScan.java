@@ -58,7 +58,7 @@ public class NPCScan {
 									new Runnable() {
 										@Override
 										public void run() {
-											SkinProfile data = getSkinData(player.getName()); 
+											SkinProfile data = getSkinData(player.getName());
 											if (data == null) {
 												player.setMetadata(srnoskinmetadata, new FixedMetadataValue(plugin, new Object()));
 											} else {
