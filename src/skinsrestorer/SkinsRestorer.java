@@ -22,21 +22,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class SkinsRestorer extends JavaPlugin implements Listener {
 
-	private SkinListeners listener;
-	public SkinListeners getListener() {
-		return listener;
+	private SkinStorage storage;
+	public SkinStorage getSkinStorage() {
+		return storage;
 	}
-
-	private FileStore storage;
 
 	@Override
 	public void onEnable() {
-		listener = new SkinListeners(this);
+		storage = new SkinStorage(this);
+		storage.loadData();
+		SkinListeners listener = new SkinListeners(this);
 		getServer().getPluginManager().registerEvents(listener, this);
 		listener.registerPlayerSkinListener();
 		getCommand("skinsrestorer").setExecutor(new Commands(this));
-		storage = new FileStore(this);
-		storage.loadData();
 		new NPCScan(this).startScan();
 	}
 

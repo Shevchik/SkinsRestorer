@@ -67,7 +67,7 @@ public class Commands implements CommandExecutor {
 						final ItemStack playerhead = new ItemStack(Material.SKULL_ITEM);
 						playerhead.setDurability((short) 3);
 						String name = args[1];
-						SkinProfile skinprofile = plugin.getListener().getLoadedSkinData(name);
+						SkinProfile skinprofile = plugin.getSkinStorage().getLoadedSkinData(name);
 						try {
 							SkullMeta meta = (SkullMeta) playerhead.getItemMeta();
 							if (meta == null) {
@@ -83,7 +83,7 @@ public class Commands implements CommandExecutor {
 									throw new RuntimeException("No skin data found for player with that name");
 								}
 								skinprofile = new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop);
-								plugin.getListener().addSkinData(name, skinprofile);
+								plugin.getSkinStorage().addSkinData(name, skinprofile);
 							}
 							GameProfile newprofile = new GameProfile(skinprofile.getUUID(), name);
 							newprofile.getProperties().clear();
@@ -92,7 +92,7 @@ public class Commands implements CommandExecutor {
 							profileField.setAccessible(true);
 							profileField.set(meta, newprofile);
 							playerhead.setItemMeta(meta);
-							plugin.getListener().addSkinData(name, skinprofile);
+							plugin.getSkinStorage().addSkinData(name, skinprofile);
 						} catch (Exception e) {
 							player.sendMessage(ChatColor.RED + "Skin wasn't applied to head because of the error: "+e.getMessage());
 						}
@@ -111,7 +111,7 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else
 		if (args.length == 2 && args[0].equalsIgnoreCase("drop")) {
-			plugin.getListener().removeSkinData(args[1]);
+			plugin.getSkinStorage().removeSkinData(args[1]);
 			player.sendMessage(ChatColor.BLUE+"Skin data for player "+args[1]+" dropped");
 		} else
 		if (args.length == 2 && args[0].equalsIgnoreCase("update")) {
@@ -132,7 +132,7 @@ public class Commands implements CommandExecutor {
 						}
 						try {
 							SkinProfile skinprofile = new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop);
-							plugin.getListener().addSkinData(name, skinprofile);
+							plugin.getSkinStorage().addSkinData(name, skinprofile);
 							player.sendMessage(ChatColor.BLUE+"Skin data for player "+name+" updated");
 						} catch (ParseException e) {
 							player.sendMessage(ChatColor.RED+"Failed to decode skin data for player with that name");

@@ -53,7 +53,7 @@ public class NPCScan {
 					HashSet<Player> onlinePlayers = new HashSet<Player>(Arrays.asList(Bukkit.getOnlinePlayers()));
 					for (World world : Bukkit.getWorlds()) {
 						for (final Player player : world.getPlayers()) {
-							if (!onlinePlayers.contains(player) && !plugin.getListener().hasLoadedSkinData(player.getName()) && !player.hasMetadata(srnoskinmetadata)) {
+							if (!onlinePlayers.contains(player) && !plugin.getSkinStorage().hasLoadedSkinData(player.getName()) && !player.hasMetadata(srnoskinmetadata)) {
 								executor.execute(
 									new Runnable() {
 										@Override
@@ -62,7 +62,7 @@ public class NPCScan {
 											if (data == null) {
 												player.setMetadata(srnoskinmetadata, new FixedMetadataValue(plugin, new Object()));
 											} else {
-												plugin.getListener().addSkinData(player.getName(), data);
+												plugin.getSkinStorage().addSkinData(player.getName(), data);
 											}
 										}
 									}

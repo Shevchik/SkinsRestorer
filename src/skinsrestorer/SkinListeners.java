@@ -18,10 +18,6 @@
 package skinsrestorer;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
 import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
@@ -50,34 +46,11 @@ public class SkinListeners implements Listener {
 		this.plugin = plugin;
 	}
 
-	//map to hold skin data
-	private HashMap<String, SkinProfile> skins = new HashMap<String, SkinProfile>(50000);
-
-	public boolean hasLoadedSkinData(String name) {
-		return skins.containsKey(name.toLowerCase());
-	}
-
-	public void addSkinData(String name, SkinProfile data) {
-		skins.put(name.toLowerCase(), data);
-	}
-
-	public void removeSkinData(String name) {
-		skins.remove(name.toLowerCase());
-	}
-
-	public SkinProfile getLoadedSkinData(String name) {
-		return skins.get(name.toLowerCase());
-	}
-
-	public Map<String, SkinProfile> getSkinData() {
-		return Collections.unmodifiableMap(skins);
-	}
-
 	//load skin data on async prelogin event
 	@EventHandler
 	public void onPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		if (hasLoadedSkinData(name) && !getLoadedSkinData(name).isTooDamnOld()) {
+		if (plugin.getSkinStorage().hasLoadedSkinData(name) && !plugin.getSkinStorage().getLoadedSkinData(name).isTooDamnOld()) {
 			return;
 		}
 		Profile prof = DataUtils.getProfile(name);
@@ -90,7 +63,7 @@ public class SkinListeners implements Listener {
 		}
 		try {
 			SkinProfile profile = new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop);
-			skins.put(name.toLowerCase(), profile);
+			plugin.getSkinStorage().addSkinData(name, profile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -106,8 +79,8 @@ public class SkinListeners implements Listener {
 				public void onPacketSending(PacketEvent event) {
 					WrappedGameProfile origprofile = event.getPacket().getGameProfiles().getValues().get(0);
 					String name = origprofile.getName();
-					if (hasLoadedSkinData(name)) {
-						SkinProfile skinprofile = getLoadedSkinData(name);
+					if (SkinListeners.this.plugin.getSkinStorage().hasLoadedSkinData(name)) {
+						SkinProfile skinprofile = SkinListeners.this.plugin.getSkinStorage().getLoadedSkinData(name);
 						WrappedGameProfile newprofile = new WrappedGameProfile(skinprofile.getUUID(), origprofile.getName());
 						WrappedSignedProperty wprop = WrappedSignedProperty.fromHandle(skinprofile.getPlayerSkinData());
 						newprofile.getProperties().clear();
@@ -137,8 +110,8 @@ public class SkinListeners implements Listener {
 			}
 			if (meta.hasOwner()) {
 				String name = meta.getOwner();
-				if (hasLoadedSkinData(name)) {
-					SkinProfile skinprofile = getLoadedSkinData(name);
+				if (plugin.getSkinStorage().hasLoadedSkinData(name)) {
+					SkinProfile skinprofile = plugin.getSkinStorage().getLoadedSkinData(name);
 					GameProfile newprofile = new GameProfile(skinprofile.getUUID(), name);
 					newprofile.getProperties().clear();
 					newprofile.getProperties().put(skinprofile.getHeadSkinData().getName(), skinprofile.getHeadSkinData());
