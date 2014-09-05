@@ -78,16 +78,49 @@ public class SkinListeners implements Listener {
 			) {
 				@Override
 				public void onPacketSending(PacketEvent event) {
+					//change packet only for 1.7.9/1.7.10 clients
+					if (ProtocolLibrary.getProtocolManager().getProtocolVersion(event.getPlayer()) != 5) {
+						return;
+					}
+					//fix game profile
 					WrappedGameProfile origprofile = event.getPacket().getGameProfiles().getValues().get(0);
 					String name = origprofile.getName();
 					if (SkinListeners.this.plugin.getSkinStorage().hasLoadedSkinData(name)) {
 						SkinProfile skinprofile = SkinListeners.this.plugin.getSkinStorage().getLoadedSkinData(name);
-						WrappedGameProfile newprofile = new WrappedGameProfile(skinprofile.getUUID(), origprofile.getName());
+						WrappedGameProfile newprofile = new WrappedGameProfile(origprofile.getUUID(), origprofile.getName());
 						WrappedSignedProperty wprop = WrappedSignedProperty.fromHandle(skinprofile.getPlayerSkinData());
 						newprofile.getProperties().clear();
 						newprofile.getProperties().put(skinprofile.getPlayerSkinData().getName(), wprop);
 						event.getPacket().getGameProfiles().write(0, newprofile);
 					}
+				}
+			}
+		);
+	}
+
+	//fix skin on tab list add packet
+	public void registerTabListItemSkinlistener() {
+		ProtocolLibrary.getProtocolManager().addPacketListener(
+			new PacketAdapter(
+				PacketAdapter.params(plugin, PacketType.Play.Server.PLAYER_INFO)
+			) {
+				@Override
+				public void onPacketSending(PacketEvent event) {
+					//change packet only for 1.8.0 clients
+					if (ProtocolLibrary.getProtocolManager().getProtocolVersion(event.getPlayer()) != 47) {
+						return;
+					}
+					//fix game profile
+					WrappedGameProfile origprofile = event.getPacket().getGameProfiles().getValues().get(0);
+					String name = origprofile.getName();
+					if (SkinListeners.this.plugin.getSkinStorage().hasLoadedSkinData(name)) {
+						SkinProfile skinprofile = SkinListeners.this.plugin.getSkinStorage().getLoadedSkinData(name);
+						WrappedGameProfile newprofile = new WrappedGameProfile(origprofile.getUUID(), origprofile.getName());
+						WrappedSignedProperty wprop = WrappedSignedProperty.fromHandle(skinprofile.getPlayerSkinData());
+						newprofile.getProperties().clear();
+						newprofile.getProperties().put(skinprofile.getPlayerSkinData().getName(), wprop);
+						event.getPacket().getGameProfiles().write(0, newprofile);
+					}					
 				}
 			}
 		);
