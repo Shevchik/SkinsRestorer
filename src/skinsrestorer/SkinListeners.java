@@ -34,6 +34,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
@@ -74,7 +75,9 @@ public class SkinListeners implements Listener {
 	public void registerPlayerSkinListener() {
 		ProtocolLibrary.getProtocolManager().addPacketListener(
 			new PacketAdapter(
-				PacketAdapter.params(plugin, PacketType.Play.Server.NAMED_ENTITY_SPAWN)
+				PacketAdapter
+				.params(plugin, PacketType.Play.Server.NAMED_ENTITY_SPAWN)
+				.listenerPriority(ListenerPriority.HIGHEST)
 			) {
 				@Override
 				public void onPacketSending(PacketEvent event) {
@@ -102,7 +105,9 @@ public class SkinListeners implements Listener {
 	public void registerTabListItemSkinlistener() {
 		ProtocolLibrary.getProtocolManager().addPacketListener(
 			new PacketAdapter(
-				PacketAdapter.params(plugin, PacketType.Play.Server.PLAYER_INFO)
+				PacketAdapter
+				.params(plugin, PacketType.Play.Server.PLAYER_INFO)
+				.listenerPriority(ListenerPriority.HIGHEST)
 			) {
 				@Override
 				public void onPacketSending(PacketEvent event) {

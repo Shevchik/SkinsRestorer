@@ -36,7 +36,6 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		listener.registerPlayerSkinListener();
 		listener.registerTabListItemSkinlistener();
 		getCommand("skinsrestorer").setExecutor(new Commands(this));
-		new NPCScan(this).startScan();
 	}
 
 	@Override
