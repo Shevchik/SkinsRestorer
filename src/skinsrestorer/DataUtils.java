@@ -43,7 +43,7 @@ public class DataUtils {
 		return null;
 	}
 
-	private static String skullbloburl = "https://sessionserver.mojang.com/session/minecraft/profile/";
+	private static final String skullbloburl = "https://sessionserver.mojang.com/session/minecraft/profile/";
 	public static Property getProp(String id) {
 		try {
 			URL url = new URL(skullbloburl+id+"?unsigned=false");

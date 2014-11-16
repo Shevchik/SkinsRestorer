@@ -20,7 +20,7 @@ package skinsrestorer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -38,8 +38,7 @@ public class SkinStorage {
 		this.plugin = plugin;
 	}
 
-	//map to hold skin data
-	private HashMap<String, SkinProfile> skins = new HashMap<String, SkinProfile>(50000);
+	private LinkedHashMap<String, SkinProfile> skins = new LinkedHashMap<String, SkinProfile>(150, 0.75F, true);
 
 	public boolean hasLoadedSkinData(String name) {
 		return skins.containsKey(name.toLowerCase());
@@ -62,7 +61,6 @@ public class SkinStorage {
 	}
 
 	private long maxHeldSkinDataNumber = 200000;
-	private long maxDaysBeforeExpire = 30;
 
 	public void loadData() {
 		int loadedSkins = 0;
@@ -77,9 +75,6 @@ public class SkinStorage {
 				return;
 			}
 			long creationDate = cs.getLong(name+".timestamp");
-			if ((System.currentTimeMillis() - creationDate) > (maxDaysBeforeExpire * 24 * 60 * 60 * 1000)) {
-				return;
-			}
 			String uuid = cs.getString(name+".uuid");
 			String propertyname = cs.getString(name+".propertyname");
 			String propertyvalue = cs.getString(name+".propertyvalue");
