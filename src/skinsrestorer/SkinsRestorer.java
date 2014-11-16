@@ -17,30 +17,80 @@
 
 package skinsrestorer;
 
+import java.util.logging.Logger;
+
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import skinsrestorer.listeners.IListener;
+import skinsrestorer.listeners.Version_Spigot_Protocol_Listener;
+import skinsrestorer.listeners.UnifiedListener;
+import skinsrestorer.listeners.Version_1_8_Listener;
+import skinsrestorer.listeners.Version_1_7_Listener;
+import skinsrestorer.storage.SkinStorage;
+
 public class SkinsRestorer extends JavaPlugin implements Listener {
+
+	private static SkinsRestorer instance;
+	public static SkinsRestorer getInstance() {
+		return instance;
+	}
+
+	private Logger log;
+	public Logger getLog() {
+		return log;
+	}
 
 	private SkinStorage storage;
 	public SkinStorage getSkinStorage() {
 		return storage;
 	}
 
+	private Config configuration;
+	public Config getConfiguration() {
+		return configuration;
+	}
+
 	@Override
 	public void onEnable() {
-		storage = new SkinStorage(this);
+		instance = this;
+		log = getLogger();
+		storage = new SkinStorage();
 		storage.loadData();
-		SkinListeners listener = new SkinListeners(this);
-		getServer().getPluginManager().registerEvents(listener, this);
-		listener.registerPlayerSkinListener();
-		listener.registerTabListItemSkinlistener();
-		getCommand("skinsrestorer").setExecutor(new Commands(this));
+		configuration = new Config();
+		configuration.loadConfig();
+		getCommand("skinsrestorer").setExecutor(new Commands());
+		UnifiedListener unifiedListener = new UnifiedListener();
+		getServer().getPluginManager().registerEvents(unifiedListener, this);
+		startListeners();
 	}
 
 	@Override
 	public void onDisable() {
 		storage.saveData();
+		instance = null;
+	}
+
+	private IListener versionedListener;
+	public void startListeners() {
+		if (versionedListener != null) {
+			versionedListener.unregister();
+		}
+		switch (configuration.getServerVersion()) {
+			case VERSION_1_7: {
+				versionedListener = new Version_1_7_Listener();
+				break;
+			}
+			case VERSION_SPIGOT_PROTOCOL: {
+				versionedListener = new Version_Spigot_Protocol_Listener();
+				break;
+			}
+			case VERSION_1_8: {
+				versionedListener = new Version_1_8_Listener();
+				break;
+			}
+		}
+		versionedListener.register();
 	}
 
 }

@@ -15,7 +15,7 @@
  *
  */
 
-package skinsrestorer;
+package skinsrestorer.storage;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,12 +31,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class SkinStorage {
+import skinsrestorer.SkinsRestorer;
 
-	private SkinsRestorer plugin;
-	public SkinStorage(SkinsRestorer plugin) {
-		this.plugin = plugin;
-	}
+public class SkinStorage {
 
 	private LinkedHashMap<String, SkinProfile> skins = new LinkedHashMap<String, SkinProfile>(150, 0.75F, true);
 
@@ -64,7 +61,7 @@ public class SkinStorage {
 
 	public void loadData() {
 		int loadedSkins = 0;
-		File datafile = new File(plugin.getDataFolder(), "data.yml");
+		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
 		FileConfiguration data = YamlConfiguration.loadConfiguration(datafile);
 		ConfigurationSection cs = data.getConfigurationSection("");
 		if (cs == null) {
@@ -89,14 +86,14 @@ public class SkinStorage {
 	}
 
 	public void saveData() {
-		File datafile = new File(plugin.getDataFolder(), "data.yml");
+		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
 		FileConfiguration data = new YamlConfiguration();
 		for (Entry<String, SkinProfile> entry : getSkinData().entrySet()) {
 			data.set(entry.getKey()+".uuid", entry.getValue().getUUID().toString());
 			data.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
-			data.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinData().getName());
-			data.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinData().getValue());
-			data.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinData().getSignature());
+			data.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
+			data.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());
+			data.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinProperty().getSignature());
 		}
 		try {
 			data.save(datafile);

@@ -15,7 +15,7 @@
  *
  */
 
-package skinsrestorer;
+package skinsrestorer.utils;
 
 import java.io.InputStream;
 import java.net.URL;
