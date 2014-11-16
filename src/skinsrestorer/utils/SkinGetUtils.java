@@ -21,9 +21,7 @@ import org.json.simple.parser.ParseException;
 
 import net.minecraft.util.com.mojang.authlib.properties.Property;
 import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
-
-import com.mojang.api.profiles.Profile;
-
+import skinsrestorer.com.mojang.api.profiles.Profile;
 import skinsrestorer.storage.SkinProfile;
 
 public class SkinGetUtils {

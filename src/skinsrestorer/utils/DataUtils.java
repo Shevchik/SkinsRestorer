@@ -28,9 +28,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import skinsrestorer.com.mojang.api.profiles.HttpProfileRepository;
+import skinsrestorer.com.mojang.api.profiles.Profile;
+
 import com.google.common.base.Charsets;
-import com.mojang.api.profiles.HttpProfileRepository;
-import com.mojang.api.profiles.Profile;
 
 public class DataUtils {
 
