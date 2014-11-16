@@ -60,7 +60,7 @@ public class SkinStorage {
 		return Collections.unmodifiableMap(skins);
 	}
 
-	private long maxHeldSkinDataNumber = 200000;
+	private long maxHeldSkinDataNumber = 10000;
 
 	public void loadData() {
 		int loadedSkins = 0;
