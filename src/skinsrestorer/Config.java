@@ -56,7 +56,7 @@ public class Config {
 	}
 
 	public static enum ServerVersion {
-		VERSION_1_7, VERSION_SPIGOT_PROTOCOL, VERSION_1_8;
+		VERSION_1_7, VERSION_SPIGOT_PROTOCOL
 	}
 
 }

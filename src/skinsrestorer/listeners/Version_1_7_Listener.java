@@ -28,6 +28,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
+import com.comphenix.protocol.reflect.StructureModifier;
 
 public class Version_1_7_Listener implements IListener {
 
@@ -42,11 +43,12 @@ public class Version_1_7_Listener implements IListener {
 		) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
-				GameProfile profile = event.getPacket().getSpecificModifier(GameProfile.class).read(0);
+				StructureModifier<GameProfile> profiles = event.getPacket().getSpecificModifier(GameProfile.class);
+				GameProfile profile = profiles.read(0);
 				String name = profile.getName();
 				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-					ProfileUtils.addTexturesData(profile, skinprofile);
+					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
 				}
 			}
 		};

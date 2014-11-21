@@ -25,14 +25,15 @@ import skinsrestorer.storage.SkinProfile;
 
 public class ProfileUtils {
 
-	public static void addTexturesData(GameProfile profile, SkinProfile skinprofile) {
-		PropertyMap properties = profile.getProperties();
+	public static GameProfile recreateProfile(GameProfile oldprofile, SkinProfile skinprofile) {
+		GameProfile newProfile = new GameProfile(skinprofile.getUUID(), oldprofile.getName());
+		newProfile.getProperties().putAll(oldprofile.getProperties());
+		PropertyMap properties = oldprofile.getProperties();
 		Property skinProperty = skinprofile.getPlayerSkinProperty();
-		if (properties.containsKey(skinProperty.getName())) {
-			return;
-		} else {
+		if (!properties.containsKey(skinProperty.getName())) {
 			properties.put(skinProperty.getName(), skinProperty);
 		}
+		return newProfile;
 	}
 
 }

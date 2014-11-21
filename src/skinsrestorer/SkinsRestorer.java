@@ -25,7 +25,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import skinsrestorer.listeners.IListener;
 import skinsrestorer.listeners.Version_Spigot_Protocol_Listener;
 import skinsrestorer.listeners.UnifiedListener;
-import skinsrestorer.listeners.Version_1_8_Listener;
 import skinsrestorer.listeners.Version_1_7_Listener;
 import skinsrestorer.storage.SkinStorage;
 
@@ -83,10 +82,6 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 			}
 			case VERSION_SPIGOT_PROTOCOL: {
 				versionedListener = new Version_Spigot_Protocol_Listener();
-				break;
-			}
-			case VERSION_1_8: {
-				versionedListener = new Version_1_8_Listener();
 				break;
 			}
 		}
