@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
+
 import skinsrestorer.com.mojang.api.http.BasicHttpClient;
 import skinsrestorer.com.mojang.api.http.HttpBody;
 import skinsrestorer.com.mojang.api.http.HttpHeader;
-import net.minecraft.util.com.google.gson.Gson;
 
 public class HttpProfileRepository {
 

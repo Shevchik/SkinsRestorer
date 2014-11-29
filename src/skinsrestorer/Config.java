@@ -26,7 +26,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 public class Config {
 
-	private ServerVersion serverversion = ServerVersion.VERSION_SPIGOT_PROTOCOL;
+	private ServerVersion serverversion = ServerVersion.VERSION_SPIGOT_1_8;
 
 	public ServerVersion getServerVersion() {
 		return serverversion;
@@ -56,7 +56,7 @@ public class Config {
 	}
 
 	public static enum ServerVersion {
-		VERSION_1_7, VERSION_SPIGOT_PROTOCOL
+		VERSION_1_7, VERSION_SPIGOT_PROTOCOL, VERSION_SPIGOT_1_8
 	}
 
 }

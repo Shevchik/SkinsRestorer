@@ -17,21 +17,13 @@
 
 package skinsrestorer;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.minecraft.util.com.mojang.authlib.GameProfile;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import skinsrestorer.storage.SkinProfile;
 import skinsrestorer.utils.SkinGetUtils;
@@ -46,53 +38,6 @@ public class Commands implements CommandExecutor {
 		if (!sender.hasPermission("skinsrestorer.cmds")) {
 			sender.sendMessage("You don't have permission to do this");
 			return true;
-		}
-		if (sender instanceof Player) {
-			final Player player = (Player) sender;
-			if ((args.length == 2) && args[0].equalsIgnoreCase("head")) {
-				player.sendMessage(ChatColor.BLUE + "Preparing head itemstack. Please wait.");
-				executor.execute(
-					new Runnable() {
-						@Override
-						public void run() {
-							final ItemStack playerhead = new ItemStack(Material.SKULL_ITEM);
-							playerhead.setDurability((short) 3);
-							String name = args[1];
-							SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-							try {
-								SkullMeta meta = (SkullMeta) playerhead.getItemMeta();
-								if (meta == null) {
-									meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-								}
-								skinprofile = SkinGetUtils.getSkinProfile(name);
-								GameProfile newprofile = new GameProfile(skinprofile.getUUID(), name);
-								newprofile.getProperties().clear();
-								newprofile.getProperties().put(skinprofile.getHeadSkinProperty().getName(), skinprofile.getHeadSkinProperty());
-								Field profileField = meta.getClass().getDeclaredField("profile");
-								profileField.setAccessible(true);
-								profileField.set(meta, newprofile);
-								playerhead.setItemMeta(meta);
-								SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, skinprofile);
-							} catch (SkinFetchFailedException e) {
-								sender.sendMessage(ChatColor.RED+"Skin wasn't applied to the head: "+e.getMessage());
-							} catch (Exception e) {
-								sender.sendMessage(ChatColor.RED+"Skin wasn't applied to the head: An error has occured: "+e.getMessage());
-							}
-							Bukkit.getScheduler().scheduleSyncDelayedTask(
-								SkinsRestorer.getInstance(),
-								new Runnable() {
-									@Override
-									public void run() {
-										player.getInventory().addItem(playerhead);
-										player.sendMessage(ChatColor.BLUE + "Head given");
-									}
-								}
-							);
-						}
-					}
-				);
-				return true;
-			}
 		}
 		if ((args.length == 2) && args[0].equalsIgnoreCase("drop")) {
 			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(args[1]);

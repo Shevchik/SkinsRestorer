@@ -17,34 +17,33 @@
 
 package skinsrestorer.utils;
 
+import java.util.UUID;
+
 import org.json.simple.parser.ParseException;
 
-import net.minecraft.util.com.mojang.authlib.properties.Property;
-import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
 import skinsrestorer.com.mojang.api.profiles.Profile;
 import skinsrestorer.storage.SkinProfile;
+import skinsrestorer.storage.SkinProperty;
 
 public class SkinGetUtils {
 
 	public static SkinProfile getSkinProfile(String name) throws SkinFetchFailedException {
 		try {
 			Profile prof = DataUtils.getProfile(name);
-			if (prof == null) {
-				throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_PREMIUM_PLAYER);
-			}
-			Property prop = DataUtils.getProp(prof.getId());
-			if (prop == null) {
-				throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_SKIN_DATA);
-			}
-			try {
-				return new SkinProfile(UUIDTypeAdapter.fromString(prof.getId()), prop);
-			} catch (ParseException e) {
-				throw new SkinFetchFailedException(SkinFetchFailedException.Reason.SKIN_RECODE_FAILED, e);
-			}
-		} catch (Exception e) {
-			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.GENERIC_ERROR, e);
+			SkinProperty prop = DataUtils.getProp(prof.getId());
+			return new SkinProfile(uuidFromString(prof.getId()), prop);
+		} catch (ParseException e) {
+			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.SKIN_RECODE_FAILED);
+		} catch (SkinFetchFailedException sffe) {
+			throw sffe;
+		} catch (Throwable t) {
+			throw new SkinFetchFailedException(t);
 		}
 	}
+
+    public static UUID uuidFromString(final String input) {
+        return UUID.fromString(input.replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+    }
 
 	public static class SkinFetchFailedException extends Exception {
 
@@ -54,15 +53,15 @@ public class SkinGetUtils {
 			super(reason.getExceptionCause()); 
 		}
 
-		public SkinFetchFailedException(Reason reason, Exception exception) {
-			super(reason.getExceptionCause(), exception); 
+		public SkinFetchFailedException(Throwable exception) {
+			super(Reason.GENERIC_ERROR.getExceptionCause()+": "+exception.getMessage(), exception); 
 		}
 
 		public static enum Reason {
 			NO_PREMIUM_PLAYER("Can't find a valid premium player with that name"),
 			NO_SKIN_DATA("No skin data found for player with that name"),
 			SKIN_RECODE_FAILED("Can't decode skin data"),
-			GENERIC_ERROR("An error has ouccured");
+			GENERIC_ERROR("An error has occured");
 
 			private String exceptionCause;
 

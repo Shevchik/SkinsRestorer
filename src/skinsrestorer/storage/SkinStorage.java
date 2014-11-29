@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import net.minecraft.util.com.mojang.authlib.properties.Property;
-
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -57,7 +55,7 @@ public class SkinStorage {
 		return Collections.unmodifiableMap(skins);
 	}
 
-	private long maxHeldSkinDataNumber = 10000;
+	private final long maxHeldSkinDataNumber = 10000;
 
 	public void loadData() {
 		int loadedSkins = 0;
@@ -77,7 +75,7 @@ public class SkinStorage {
 			String propertyvalue = cs.getString(name+".propertyvalue");
 			String propertysignature = cs.getString(name+".propertysignature");
 			try {
-				SkinProfile skinData = new SkinProfile(UUID.fromString(uuid), new Property(propertyname, propertyvalue, propertysignature), creationDate);
+				SkinProfile skinData = new SkinProfile(UUID.fromString(uuid), new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
 				addSkinData(name, skinData);
 				loadedSkins++;
 			} catch (Exception e) {

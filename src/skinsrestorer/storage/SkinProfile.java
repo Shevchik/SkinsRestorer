@@ -17,12 +17,10 @@
 
 package skinsrestorer.storage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import net.minecraft.util.com.mojang.authlib.properties.Property;
-import net.minecraft.util.org.apache.commons.codec.Charsets;
-import net.minecraft.util.org.apache.commons.codec.binary.Base64;
-
+import org.apache.commons.codec.binary.Base64;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -31,17 +29,17 @@ public class SkinProfile {
 
 	private UUID uuid;
 	private long timestamp;
-	private Property playerSkinData;
-	private Property headSkinData;
+	private SkinProperty playerSkinData;
+	private SkinProperty headSkinData;
 
-	public SkinProfile(UUID uuid, Property skinData) throws ParseException {
+	public SkinProfile(UUID uuid, SkinProperty skinData) throws ParseException {
 		this.uuid = uuid;
 		timestamp = System.currentTimeMillis();
 		playerSkinData = skinData;
 		headSkinData = recodePlayerSkinDataToHeadSkinData(skinData);
 	}
 
-	public SkinProfile(UUID uuid, Property skinData, long creationTime) throws ParseException {
+	public SkinProfile(UUID uuid, SkinProperty skinData, long creationTime) throws ParseException {
 		this(uuid, skinData);
 		timestamp = creationTime;
 	}
@@ -58,19 +56,19 @@ public class SkinProfile {
 		return uuid;
 	}
 
-	public Property getPlayerSkinProperty() {
+	public SkinProperty getPlayerSkinProperty() {
 		return playerSkinData;
 	}
 
-	public Property getHeadSkinProperty() {
+	public SkinProperty getHeadSkinProperty() {
 		return headSkinData;
 	}
 
-	private Property recodePlayerSkinDataToHeadSkinData(Property playerskindata) throws ParseException {
+	private SkinProperty recodePlayerSkinDataToHeadSkinData(SkinProperty playerskindata) throws ParseException {
 		String oldvalue = playerskindata.getValue();
-		JSONObject skindata = (JSONObject) new JSONParser().parse(new String(Base64.decodeBase64(oldvalue), Charsets.UTF_8));
+		JSONObject skindata = (JSONObject) new JSONParser().parse(new String(Base64.decodeBase64(oldvalue), StandardCharsets.UTF_8));
 		skindata.remove("isPublic");
-		return new Property(playerskindata.getName(), Base64.encodeBase64String(skindata.toJSONString().getBytes(Charsets.UTF_8)), "");
+		return new SkinProperty(playerskindata.getName(), Base64.encodeBase64String(skindata.toJSONString().getBytes(StandardCharsets.UTF_8)), "");
 	}
 
 }
