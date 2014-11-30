@@ -42,12 +42,6 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		log.info(message);
 	}
 
-	public void logDebug(String message) {
-		if (getConfiguration().isDebug()) {
-			log.info(message);
-		}
-	}
-
 	private SkinStorage storage;
 	public SkinStorage getSkinStorage() {
 		return storage;

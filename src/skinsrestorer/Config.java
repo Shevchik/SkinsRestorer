@@ -32,12 +32,6 @@ public class Config {
 		return serverversion;
 	}
 
-	private boolean debug = false;
-
-	public boolean isDebug() {
-		return debug;
-	}
-
 	private ArrayList<String> allPossibleVersions = new ArrayList<String>();
 	{
 		for (ServerVersion version : ServerVersion.values()) {
@@ -49,14 +43,12 @@ public class Config {
 		File conffile = new File(SkinsRestorer.getInstance().getDataFolder(), "config.yml");
 		FileConfiguration conf = YamlConfiguration.loadConfiguration(conffile);
 		ServerVersion version = ServerVersion.valueOf(conf.getString("server_version", serverversion.toString()));
-		debug = conf.getBoolean("debug", debug);
 		if (version != null) {
 			serverversion = version;
 		}
 		conf = new YamlConfiguration();
 		conf.set("server_version", serverversion.toString());
 		conf.set("all_possible_versions", allPossibleVersions);
-		conf.set("debug", debug);
 		try {
 			conf.save(conffile);
 		} catch (IOException e) {

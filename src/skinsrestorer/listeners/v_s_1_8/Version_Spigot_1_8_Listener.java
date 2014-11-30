@@ -33,12 +33,33 @@ import com.mojang.authlib.GameProfile;
 
 public class Version_Spigot_1_8_Listener implements IListener, Listener {
 
-	private PacketListener spawnListener;
-	private PacketListener tablistListener;
+	private final ArrayList<PacketListener> listeners = new ArrayList<PacketListener>();
+
+	//fix uuid on login succ packet
+	private void registerLoginOutSuccUUIDListener() {
+		PacketListener loginsuccListener = new PacketAdapter(
+			PacketAdapter
+			.params(SkinsRestorer.getInstance(), PacketType.Login.Server.SUCCESS)
+			.listenerPriority(ListenerPriority.HIGHEST)
+		) {
+			@Override
+			public void onPacketSending(PacketEvent event) {
+				StructureModifier<GameProfile> profiles = event.getPacket().getSpecificModifier(GameProfile.class);
+				GameProfile profile = profiles.read(0);
+				String name = profile.getName();
+				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
+					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
+					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
+				}
+			}
+		};
+		ProtocolLibrary.getProtocolManager().addPacketListener(loginsuccListener);
+		listeners.add(loginsuccListener);
+	}
 
 	//fix uuid on entity spawn packet
 	private void registerPlayerSkinListener() {
-		spawnListener = new PacketAdapter(
+		PacketListener spawnListener = new PacketAdapter(
 			PacketAdapter
 			.params(SkinsRestorer.getInstance(), PacketType.Play.Server.NAMED_ENTITY_SPAWN)
 			.listenerPriority(ListenerPriority.HIGHEST)
@@ -48,9 +69,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 				StructureModifier<UUID> uuids = event.getPacket().getSpecificModifier(UUID.class);
 				UUID uuid = uuids.read(0);
 				Player player = Bukkit.getPlayer(uuid);
-				SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Checking NamedEntitySpawn packet for player "+player.getName());
 				if (player != null && SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(player.getName())) {
-					SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Modifying NamedEntitySpawn packet for player "+player.getName());
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName());
 					uuids.write(0, skinprofile.getUUID());
 				}
@@ -61,7 +80,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 
 	//fix skin on tab list add packet
 	private void registerTabListItemSkinlistener() {
-		tablistListener = new PacketAdapter(
+		PacketListener tablistListener = new PacketAdapter(
 			PacketAdapter
 			.params(SkinsRestorer.getInstance(), PacketType.Play.Server.PLAYER_INFO)
 			.listenerPriority(ListenerPriority.HIGHEST)
@@ -74,13 +93,11 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 				List<PlayerInfoData> newdatas = new ArrayList<PlayerInfoData>();
 				for (PlayerInfoData data : datas) {
 					String name = data.a().getName();
-					SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Checking PlayerInfo packet for player "+name);
 					if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
-						SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Modifying PlayerInfo packet for player "+name);
 						SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 						PlayerInfoData newdata = new PlayerInfoData(
 							(PacketPlayOutPlayerInfo) event.getPacket().getHandle(),
-							ProfileUtils.recreateProfile(data.a(), skinprofile, name.equals(event.getPlayer().getName())),
+							ProfileUtils.recreateProfile(data.a(), skinprofile),
 							data.b(), data.c(), data.d()
 						);
 						newdatas.add(newdata);
@@ -116,7 +133,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 					Field profileField = meta.getClass().getDeclaredField("profile");
 					profileField.setAccessible(true);
-					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile, false));
+					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile));
 					itemstack.setItemMeta(meta);
 				}
 			}
@@ -127,14 +144,17 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 	@Override
 	public void register() {
 		Bukkit.getPluginManager().registerEvents(this, SkinsRestorer.getInstance());
+		registerLoginOutSuccUUIDListener();
 		registerPlayerSkinListener();
 		registerTabListItemSkinlistener();
 	}
 
 	@Override
 	public void unregister() {
-		ProtocolLibrary.getProtocolManager().removePacketListener(spawnListener);
-		ProtocolLibrary.getProtocolManager().removePacketListener(tablistListener);
+		for (PacketListener listener : listeners) {
+			ProtocolLibrary.getProtocolManager().removePacketListener(listener);
+		}
+		listeners.clear();
 		HandlerList.unregisterAll(this);
 	}
 
