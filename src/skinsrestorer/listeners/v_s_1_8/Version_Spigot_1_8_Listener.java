@@ -48,9 +48,9 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 				StructureModifier<UUID> uuids = event.getPacket().getSpecificModifier(UUID.class);
 				UUID uuid = uuids.read(0);
 				Player player = Bukkit.getPlayer(uuid);
-				SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Checking NameEntitySpawn packet for player "+player.getName());
+				SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Checking NamedEntitySpawn packet for player "+player.getName());
 				if (player != null && SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(player.getName())) {
-					SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Modifying NameEntitySpawn packet for player "+player.getName());
+					SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Modifying NamedEntitySpawn packet for player "+player.getName());
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName());
 					uuids.write(0, skinprofile.getUUID());
 				}
@@ -80,7 +80,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 						SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 						PlayerInfoData newdata = new PlayerInfoData(
 							(PacketPlayOutPlayerInfo) event.getPacket().getHandle(),
-							ProfileUtils.recreateProfile(data.a(), skinprofile),
+							ProfileUtils.recreateProfile(data.a(), skinprofile, name.equals(event.getPlayer().getName())),
 							data.b(), data.c(), data.d()
 						);
 						newdatas.add(newdata);
@@ -116,7 +116,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 					Field profileField = meta.getClass().getDeclaredField("profile");
 					profileField.setAccessible(true);
-					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile));
+					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile, false));
 					itemstack.setItemMeta(meta);
 				}
 			}

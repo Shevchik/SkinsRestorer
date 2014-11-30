@@ -9,8 +9,8 @@ import skinsrestorer.storage.SkinProperty;
 
 class ProfileUtils {
 
-	public static GameProfile recreateProfile(GameProfile oldprofile, SkinProfile skinprofile) {
-		GameProfile newProfile = new GameProfile(skinprofile.getUUID(), oldprofile.getName());
+	public static GameProfile recreateProfile(GameProfile oldprofile, SkinProfile skinprofile, boolean keepUUID) {
+		GameProfile newProfile = new GameProfile(keepUUID ? oldprofile.getId() : skinprofile.getUUID(), oldprofile.getName());
 		newProfile.getProperties().putAll(oldprofile.getProperties());
 		PropertyMap properties = oldprofile.getProperties();
 		Property skinProperty = convertProperty(skinprofile.getPlayerSkinProperty());

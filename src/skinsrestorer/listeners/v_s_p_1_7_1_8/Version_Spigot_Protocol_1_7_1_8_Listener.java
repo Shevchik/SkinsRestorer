@@ -62,7 +62,7 @@ public class Version_Spigot_Protocol_1_7_1_8_Listener implements IListener, List
 				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
 					SkinsRestorer.getInstance().logDebug("[V_S_P_1_7_1_8]: Modifying NameEntitySpawn packet for player "+name);
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
+					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile, false));
 				}
 			}
 		};
@@ -85,7 +85,7 @@ public class Version_Spigot_Protocol_1_7_1_8_Listener implements IListener, List
 				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
 					SkinsRestorer.getInstance().logDebug("[V_S_P_1_7_1_8]: Modifying PlayerInfo packet for player "+name);
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
+					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile, name.equals(event.getPlayer().getName())));
 				}
 			}
 		};
@@ -114,7 +114,7 @@ public class Version_Spigot_Protocol_1_7_1_8_Listener implements IListener, List
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 					Field profileField = meta.getClass().getDeclaredField("profile");
 					profileField.setAccessible(true);
-					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile));
+					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile, false));
 					itemstack.setItemMeta(meta);
 				}
 			}
