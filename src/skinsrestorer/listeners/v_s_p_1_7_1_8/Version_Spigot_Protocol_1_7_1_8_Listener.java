@@ -59,6 +59,7 @@ public class Version_Spigot_Protocol_1_7_1_8_Listener implements IListener, List
 				GameProfile profile = profiles.read(0);
 				String name = profile.getName();
 				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
+					SkinsRestorer.getInstance().logDebug("[V_S_P_1_7_1_8]: Modifying NameEntitySpawn packet for player "+name);
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
 				}
@@ -80,6 +81,7 @@ public class Version_Spigot_Protocol_1_7_1_8_Listener implements IListener, List
 				GameProfile profile = profiles.read(0);
 				String name = profile.getName();
 				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
+					SkinsRestorer.getInstance().logDebug("[V_S_P_1_7_1_8]: Modifying PlayerInfo packet for player "+name);
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
 				}

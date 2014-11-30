@@ -58,6 +58,7 @@ public class Version_1_7_Listener implements IListener, Listener {
 				GameProfile profile = profiles.read(0);
 				String name = profile.getName();
 				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
+					SkinsRestorer.getInstance().logDebug("[V_1_7]: Modifying NameEntitySpawn packet for player "+name);
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
 				}

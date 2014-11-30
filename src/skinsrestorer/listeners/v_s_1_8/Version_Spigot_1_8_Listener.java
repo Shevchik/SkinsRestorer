@@ -49,6 +49,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 				UUID uuid = uuids.read(0);
 				Player player = Bukkit.getPlayer(uuid);
 				if (player != null && SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(player.getName())) {
+					SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Modifying NameEntitySpawn packet for player "+player.getName());
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName());
 					uuids.write(0, skinprofile.getUUID());
 				}
@@ -73,6 +74,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 				for (PlayerInfoData data : datas) {
 					String name = data.a().getName();
 					if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
+						SkinsRestorer.getInstance().logDebug("[V_S_1_8]: Modifying PlayerInfo packet for player "+name);
 						SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 						PlayerInfoData newdata = new PlayerInfoData(
 							(PacketPlayOutPlayerInfo) event.getPacket().getHandle(),
