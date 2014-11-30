@@ -37,8 +37,9 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 	}
 
 	private Logger log;
-	public Logger getLog() {
-		return log;
+
+	public void logInfo(String message) {
+		log.info(message);
 	}
 
 	private SkinStorage storage;

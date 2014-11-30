@@ -17,11 +17,10 @@
 
 package skinsrestorer.listeners;
 
-import java.util.logging.Level;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+
 import skinsrestorer.SkinsRestorer;
 import skinsrestorer.storage.SkinProfile;
 import skinsrestorer.utils.SkinGetUtils;
@@ -32,16 +31,17 @@ public class LoginListener implements Listener {
 	//load skin data on async prelogin event
 	@EventHandler
 	public void onPreLoginEvent(AsyncPlayerPreLoginEvent event) {
-		System.out.println(event.getName());
 		String name = event.getName();
 		if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name) && !SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name).isTooDamnOld()) {
+			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" is already cached");
 			return;
 		}
 		try {
 			SkinProfile profile = SkinGetUtils.getSkinProfile(name);
 			SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
+			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" was succesfully fetched and cached");
 		} catch (SkinFetchFailedException e) {
-			SkinsRestorer.getInstance().getLog().log(Level.INFO, "Skin fetch failed for player "+name+": "+e.getMessage());
+			SkinsRestorer.getInstance().logInfo("Skin fetch failed for player "+name+": "+e.getMessage());
 		}
 	}
 
