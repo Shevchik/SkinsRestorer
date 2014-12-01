@@ -1,6 +1,5 @@
 package skinsrestorer.listeners.v_s_1_8;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -9,14 +8,9 @@ import net.minecraft.server.v1_8_R1.PacketPlayOutPlayerInfo;
 import net.minecraft.server.v1_8_R1.PlayerInfoData;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import skinsrestorer.SkinsRestorer;
 import skinsrestorer.listeners.IListener;
@@ -29,6 +23,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.reflect.StructureModifier;
+
 import com.mojang.authlib.GameProfile;
 
 public class Version_Spigot_1_8_Listener implements IListener, Listener {
@@ -109,36 +104,6 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 			}
 		};
 		ProtocolLibrary.getProtocolManager().addPacketListener(tablistListener);
-	}
-
-	//fix spawned head item game profile
-	@EventHandler
-	public void onHeadItemSpawn(ItemSpawnEvent event) {
-		ItemStack itemstack = event.getEntity().getItemStack();
-		if ((itemstack.getType() == Material.SKULL_ITEM) && (itemstack.getDurability() == 3)) {
-			fixHeadSkin(itemstack);
-			event.getEntity().setItemStack(itemstack);
-		}
-	}
-
-	private void fixHeadSkin(ItemStack itemstack) {
-		try {
-			SkullMeta meta = (SkullMeta) itemstack.getItemMeta();
-			if (meta == null) {
-				meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-			}
-			if (meta.hasOwner()) {
-				String name = meta.getOwner();
-				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
-					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-					Field profileField = meta.getClass().getDeclaredField("profile");
-					profileField.setAccessible(true);
-					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile));
-					itemstack.setItemMeta(meta);
-				}
-			}
-		} catch (Exception e) {
-		}
 	}
 
 	@Override

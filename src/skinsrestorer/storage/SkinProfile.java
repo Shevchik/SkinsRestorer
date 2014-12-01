@@ -17,12 +17,8 @@
 
 package skinsrestorer.storage;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import org.apache.commons.codec.binary.Base64;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class SkinProfile {
@@ -30,13 +26,11 @@ public class SkinProfile {
 	private UUID uuid;
 	private long timestamp;
 	private SkinProperty playerSkinData;
-	private SkinProperty headSkinData;
 
 	public SkinProfile(UUID uuid, SkinProperty skinData) throws ParseException {
 		this.uuid = uuid;
 		timestamp = System.currentTimeMillis();
 		playerSkinData = skinData;
-		headSkinData = recodePlayerSkinDataToHeadSkinData(skinData);
 	}
 
 	public SkinProfile(UUID uuid, SkinProperty skinData, long creationTime) throws ParseException {
@@ -58,17 +52,6 @@ public class SkinProfile {
 
 	public SkinProperty getPlayerSkinProperty() {
 		return playerSkinData;
-	}
-
-	public SkinProperty getHeadSkinProperty() {
-		return headSkinData;
-	}
-
-	private SkinProperty recodePlayerSkinDataToHeadSkinData(SkinProperty playerskindata) throws ParseException {
-		String oldvalue = playerskindata.getValue();
-		JSONObject skindata = (JSONObject) new JSONParser().parse(new String(Base64.decodeBase64(oldvalue), StandardCharsets.UTF_8));
-		skindata.remove("isPublic");
-		return new SkinProperty(playerskindata.getName(), Base64.encodeBase64String(skindata.toJSONString().getBytes(StandardCharsets.UTF_8)), "");
 	}
 
 }

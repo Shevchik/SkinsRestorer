@@ -17,19 +17,14 @@
 
 package skinsrestorer.listeners.v_s_p_1_7_1_8;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import net.minecraft.util.com.mojang.authlib.GameProfile;
+
 import skinsrestorer.SkinsRestorer;
 import skinsrestorer.listeners.IListener;
 import skinsrestorer.storage.SkinProfile;
@@ -110,36 +105,6 @@ public class Version_Spigot_Protocol_1_7_1_8_Listener implements IListener, List
 		};
 		ProtocolLibrary.getProtocolManager().addPacketListener(tablistListener);
 		listeners.add(tablistListener);
-	}
-
-	//fix spawned head item game profile
-	@EventHandler
-	public void onHeadItemSpawn(ItemSpawnEvent event) {
-		ItemStack itemstack = event.getEntity().getItemStack();
-		if ((itemstack.getType() == Material.SKULL_ITEM) && (itemstack.getDurability() == 3)) {
-			fixHeadSkin(itemstack);
-			event.getEntity().setItemStack(itemstack);
-		}
-	}
-
-	private void fixHeadSkin(ItemStack itemstack) {
-		try {
-			SkullMeta meta = (SkullMeta) itemstack.getItemMeta();
-			if (meta == null) {
-				meta = (SkullMeta) Bukkit.getItemFactory().getItemMeta(Material.SKULL_ITEM);
-			}
-			if (meta.hasOwner()) {
-				String name = meta.getOwner();
-				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
-					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-					Field profileField = meta.getClass().getDeclaredField("profile");
-					profileField.setAccessible(true);
-					profileField.set(meta, ProfileUtils.recreateProfile((GameProfile) profileField.get(meta), skinprofile));
-					itemstack.setItemMeta(meta);
-				}
-			}
-		} catch (Exception e) {
-		}
 	}
 
 	@Override

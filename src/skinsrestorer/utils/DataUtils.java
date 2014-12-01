@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -32,8 +32,7 @@ import skinsrestorer.com.mojang.api.profiles.HttpProfileRepository;
 import skinsrestorer.com.mojang.api.profiles.Profile;
 import skinsrestorer.storage.SkinProperty;
 import skinsrestorer.utils.SkinGetUtils.SkinFetchFailedException;
-
-import com.google.common.base.Charsets;
+import skinsrestorer.utils.apacheutils.IOUtils;
 
 public class DataUtils {
 
@@ -54,7 +53,7 @@ public class DataUtils {
 		connection.setReadTimeout(10000);
 		connection.setUseCaches(false);
 		InputStream is = connection.getInputStream();
-		String result = IOUtils.toString(is, Charsets.UTF_8);
+		String result = IOUtils.toString(is, StandardCharsets.UTF_8);
 		IOUtils.closeQuietly(is);
 		JSONArray properties = (JSONArray) ((JSONObject) new JSONParser().parse(result)).get("properties");
 		for (int i = 0; i < properties.size(); i++) {

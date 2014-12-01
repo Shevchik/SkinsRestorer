@@ -54,7 +54,7 @@ public class SkinGetUtils {
 		}
 
 		public SkinFetchFailedException(Throwable exception) {
-			super(Reason.GENERIC_ERROR.getExceptionCause()+": "+exception.getMessage(), exception); 
+			super(Reason.GENERIC_ERROR.getExceptionCause()+": "+exception.getClass().getName()+": "+exception.getMessage(), exception); 
 		}
 
 		public static enum Reason {
