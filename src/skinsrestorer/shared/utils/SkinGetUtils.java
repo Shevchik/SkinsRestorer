@@ -19,9 +19,8 @@ package skinsrestorer.shared.utils;
 
 import java.util.UUID;
 
-import org.json.simple.parser.ParseException;
-
-import skinsrestorer.com.mojang.api.profiles.Profile;
+import skinsrestorer.libs.com.mojang.api.profiles.Profile;
+import skinsrestorer.libs.org.json.simple.parser.ParseException;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
 

@@ -23,13 +23,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import skinsrestorer.com.mojang.api.profiles.HttpProfileRepository;
-import skinsrestorer.com.mojang.api.profiles.Profile;
+import skinsrestorer.libs.com.mojang.api.profiles.HttpProfileRepository;
+import skinsrestorer.libs.com.mojang.api.profiles.Profile;
+import skinsrestorer.libs.org.json.simple.JSONArray;
+import skinsrestorer.libs.org.json.simple.JSONObject;
+import skinsrestorer.libs.org.json.simple.parser.JSONParser;
+import skinsrestorer.libs.org.json.simple.parser.ParseException;
 import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
 import skinsrestorer.shared.utils.apacheutils.IOUtils;

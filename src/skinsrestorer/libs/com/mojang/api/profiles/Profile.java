@@ -1,4 +1,4 @@
-package skinsrestorer.com.mojang.api.profiles;
+package skinsrestorer.libs.com.mojang.api.profiles;
 
 public class Profile {
 

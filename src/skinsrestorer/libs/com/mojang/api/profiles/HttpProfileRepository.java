@@ -1,4 +1,4 @@
-package skinsrestorer.com.mojang.api.profiles;
+package skinsrestorer.libs.com.mojang.api.profiles;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -9,13 +9,12 @@ import java.util.List;
 
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
 
-import skinsrestorer.com.mojang.api.http.BasicHttpClient;
-import skinsrestorer.com.mojang.api.http.HttpBody;
-import skinsrestorer.com.mojang.api.http.HttpHeader;
+import skinsrestorer.libs.com.mojang.api.http.BasicHttpClient;
+import skinsrestorer.libs.com.mojang.api.http.HttpBody;
+import skinsrestorer.libs.com.mojang.api.http.HttpHeader;
 
 public class HttpProfileRepository {
 
-	// You're not allowed to request more than 100 profiles per go.
 	private static final int PROFILES_PER_REQUEST = 100;
 
 	private static Gson gson = new Gson();
@@ -55,14 +54,12 @@ public class HttpProfileRepository {
 				i++;
 			} while (start < namesCount);
 		} catch (Exception e) {
-			// TODO: logging and allowing consumer to react?
 		}
 
 		return profiles.toArray(new Profile[profiles.size()]);
 	}
 
 	private URL getProfilesUrl() throws MalformedURLException {
-		// To lookup Minecraft profiles, agent should be "minecraft"
 		return new URL("https://api.mojang.com/profiles/" + agent);
 	}
 

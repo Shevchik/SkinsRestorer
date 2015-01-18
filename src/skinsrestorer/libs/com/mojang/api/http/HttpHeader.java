@@ -1,4 +1,4 @@
-package skinsrestorer.com.mojang.api.http;
+package skinsrestorer.libs.com.mojang.api.http;
 
 public class HttpHeader {
 
