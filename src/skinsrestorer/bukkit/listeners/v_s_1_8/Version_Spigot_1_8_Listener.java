@@ -1,20 +1,16 @@
-package skinsrestorer.listeners.v_s_1_8;
+package skinsrestorer.bukkit.listeners.v_s_1_8;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import net.minecraft.server.v1_8_R1.PacketPlayOutPlayerInfo;
 import net.minecraft.server.v1_8_R1.PlayerInfoData;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-import skinsrestorer.SkinsRestorer;
-import skinsrestorer.listeners.IListener;
-import skinsrestorer.storage.SkinProfile;
+import skinsrestorer.bukkit.SkinsRestorer;
+import skinsrestorer.bukkit.listeners.IListener;
+import skinsrestorer.shared.format.SkinProfile;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -23,7 +19,6 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.reflect.StructureModifier;
-
 import com.mojang.authlib.GameProfile;
 
 public class Version_Spigot_1_8_Listener implements IListener, Listener {
@@ -44,33 +39,12 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 				String name = profile.getName();
 				if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name)) {
 					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-					profiles.write(0, ProfileUtils.recreateProfile(profile, skinprofile));
+					profiles.write(0, ProfileUtils.addSkinToProfile(profile, skinprofile));
 				}
 			}
 		};
 		ProtocolLibrary.getProtocolManager().addPacketListener(loginsuccListener);
 		listeners.add(loginsuccListener);
-	}
-
-	//fix uuid on entity spawn packet
-	private void registerPlayerSkinListener() {
-		PacketListener spawnListener = new PacketAdapter(
-			PacketAdapter
-			.params(SkinsRestorer.getInstance(), PacketType.Play.Server.NAMED_ENTITY_SPAWN)
-			.listenerPriority(ListenerPriority.HIGHEST)
-		) {
-			@Override
-			public void onPacketSending(PacketEvent event) {
-				StructureModifier<UUID> uuids = event.getPacket().getSpecificModifier(UUID.class);
-				UUID uuid = uuids.read(0);
-				Player player = Bukkit.getPlayer(uuid);
-				if (player != null && SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(player.getName())) {
-					SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName());
-					uuids.write(0, skinprofile.getUUID());
-				}
-			}
-		};
-		ProtocolLibrary.getProtocolManager().addPacketListener(spawnListener);
 	}
 
 	//fix skin on tab list add packet
@@ -92,7 +66,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 						SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 						PlayerInfoData newdata = new PlayerInfoData(
 							(PacketPlayOutPlayerInfo) event.getPacket().getHandle(),
-							ProfileUtils.recreateProfile(data.a(), skinprofile),
+							ProfileUtils.addSkinToProfile(data.a(), skinprofile),
 							data.b(), data.c(), data.d()
 						);
 						newdatas.add(newdata);
@@ -108,9 +82,7 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 
 	@Override
 	public void register() {
-		Bukkit.getPluginManager().registerEvents(this, SkinsRestorer.getInstance());
 		registerLoginOutSuccUUIDListener();
-		registerPlayerSkinListener();
 		registerTabListItemSkinlistener();
 	}
 
@@ -120,7 +92,6 @@ public class Version_Spigot_1_8_Listener implements IListener, Listener {
 			ProtocolLibrary.getProtocolManager().removePacketListener(listener);
 		}
 		listeners.clear();
-		HandlerList.unregisterAll(this);
 	}
 
 }

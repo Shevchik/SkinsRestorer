@@ -15,16 +15,16 @@
  *
  */
 
-package skinsrestorer.listeners;
+package skinsrestorer.bukkit.listeners;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
-import skinsrestorer.SkinsRestorer;
-import skinsrestorer.storage.SkinProfile;
-import skinsrestorer.utils.SkinGetUtils;
-import skinsrestorer.utils.SkinGetUtils.SkinFetchFailedException;
+import skinsrestorer.bukkit.SkinsRestorer;
+import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.utils.SkinGetUtils;
+import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
 
 public class LoginListener implements Listener {
 

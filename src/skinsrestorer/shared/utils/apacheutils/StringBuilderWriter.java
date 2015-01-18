@@ -1,4 +1,4 @@
-package skinsrestorer.utils.apacheutils;
+package skinsrestorer.shared.utils.apacheutils;
 
 import java.io.Serializable;
 import java.io.Writer;

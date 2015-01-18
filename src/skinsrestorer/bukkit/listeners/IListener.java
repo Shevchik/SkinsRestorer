@@ -15,7 +15,7 @@
  *
  */
 
-package skinsrestorer.listeners;
+package skinsrestorer.bukkit.listeners;
 
 public interface IListener {
 

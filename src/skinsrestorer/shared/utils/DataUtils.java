@@ -15,7 +15,7 @@
  *
  */
 
-package skinsrestorer.utils;
+package skinsrestorer.shared.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +30,9 @@ import org.json.simple.parser.ParseException;
 
 import skinsrestorer.com.mojang.api.profiles.HttpProfileRepository;
 import skinsrestorer.com.mojang.api.profiles.Profile;
-import skinsrestorer.storage.SkinProperty;
-import skinsrestorer.utils.SkinGetUtils.SkinFetchFailedException;
-import skinsrestorer.utils.apacheutils.IOUtils;
+import skinsrestorer.shared.format.SkinProperty;
+import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
+import skinsrestorer.shared.utils.apacheutils.IOUtils;
 
 public class DataUtils {
 

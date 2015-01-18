@@ -15,19 +15,19 @@
  *
  */
 
-package skinsrestorer;
+package skinsrestorer.bukkit;
 
 import java.util.logging.Logger;
 
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import skinsrestorer.listeners.IListener;
-import skinsrestorer.listeners.LoginListener;
-import skinsrestorer.listeners.v_1_7.Version_1_7_Listener;
-import skinsrestorer.listeners.v_s_1_8.Version_Spigot_1_8_Listener;
-import skinsrestorer.listeners.v_s_p_1_7_1_8.Version_Spigot_Protocol_1_7_1_8_Listener;
-import skinsrestorer.storage.SkinStorage;
+import skinsrestorer.bukkit.listeners.IListener;
+import skinsrestorer.bukkit.listeners.LoginListener;
+import skinsrestorer.bukkit.listeners.v_1_7.Version_1_7_Listener;
+import skinsrestorer.bukkit.listeners.v_s_1_8.Version_Spigot_1_8_Listener;
+import skinsrestorer.bukkit.listeners.v_s_p_1_7_1_8.Version_Spigot_Protocol_1_7_1_8_Listener;
+import skinsrestorer.bukkit.storage.SkinStorage;
 
 public class SkinsRestorer extends JavaPlugin implements Listener {
 

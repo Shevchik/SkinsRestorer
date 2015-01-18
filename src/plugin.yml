@@ -1,6 +1,6 @@
 name: SkinsRestorer
-main: skinsrestorer.SkinsRestorer
-version: 9.1
+main: skinsrestorer.bukkit.SkinsRestorer
+version: 9.2.dev
 author: _Shevchik_
 depend: [ProtocolLib]
 load: startup

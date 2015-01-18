@@ -15,7 +15,7 @@
  *
  */
 
-package skinsrestorer;
+package skinsrestorer.bukkit;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,9 +25,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import skinsrestorer.storage.SkinProfile;
-import skinsrestorer.utils.SkinGetUtils;
-import skinsrestorer.utils.SkinGetUtils.SkinFetchFailedException;
+import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.utils.SkinGetUtils;
+import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
 
 public class Commands implements CommandExecutor {
 

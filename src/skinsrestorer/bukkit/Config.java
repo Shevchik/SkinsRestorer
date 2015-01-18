@@ -15,7 +15,7 @@
  *
  */
 
-package skinsrestorer;
+package skinsrestorer.bukkit;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +27,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class Config {
 
 	private ServerVersion serverversion = ServerVersion.VERSION_SPIGOT_1_8;
+
+	private int skinCacheTime = 24 * 60 * 60;
+
+	public int getSkinCacheTime() {
+		return skinCacheTime;
+	}
 
 	public ServerVersion getServerVersion() {
 		return serverversion;
@@ -42,11 +48,14 @@ public class Config {
 	public void loadConfig() {
 		File conffile = new File(SkinsRestorer.getInstance().getDataFolder(), "config.yml");
 		FileConfiguration conf = YamlConfiguration.loadConfiguration(conffile);
-		ServerVersion version = ServerVersion.valueOf(conf.getString("server_version", serverversion.toString()));
-		if (version != null) {
-			serverversion = version;
+		skinCacheTime = conf.getInt("skin_cache_time", skinCacheTime);
+		try {
+			serverversion = ServerVersion.valueOf(conf.getString("server_version", serverversion.toString()));
+		} catch (Throwable t) {
+			serverversion = ServerVersion.VERSION_SPIGOT_1_8;
 		}
 		conf = new YamlConfiguration();
+		conf.set("skin_cache_time", skinCacheTime);
 		conf.set("server_version", serverversion.toString());
 		conf.set("all_possible_versions", allPossibleVersions);
 		try {

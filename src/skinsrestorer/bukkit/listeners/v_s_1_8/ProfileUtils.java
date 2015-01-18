@@ -1,23 +1,21 @@
-package skinsrestorer.listeners.v_s_1_8;
+package skinsrestorer.bukkit.listeners.v_s_1_8;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 
-import skinsrestorer.storage.SkinProfile;
-import skinsrestorer.storage.SkinProperty;
+import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.format.SkinProperty;
 
 class ProfileUtils {
 
-	public static GameProfile recreateProfile(GameProfile oldprofile, SkinProfile skinprofile) {
-		GameProfile newProfile = new GameProfile(skinprofile.getUUID(), oldprofile.getName());
-		newProfile.getProperties().putAll(oldprofile.getProperties());
-		PropertyMap properties = oldprofile.getProperties();
+	public static GameProfile addSkinToProfile(GameProfile profile, SkinProfile skinprofile) {
+		PropertyMap properties = profile.getProperties();
 		Property skinProperty = convertProperty(skinprofile.getPlayerSkinProperty());
 		if (!properties.containsKey(skinProperty.getName())) {
 			properties.put(skinProperty.getName(), skinProperty);
 		}
-		return newProfile;
+		return profile;
 	}
 
 	private static Property convertProperty(SkinProperty property) {

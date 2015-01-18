@@ -15,7 +15,7 @@
  *
  */
 
-package skinsrestorer.storage;
+package skinsrestorer.bukkit.storage;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,13 +23,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import skinsrestorer.SkinsRestorer;
+import skinsrestorer.bukkit.SkinsRestorer;
+import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.format.SkinProperty;
 
 public class SkinStorage {
 
@@ -70,12 +71,11 @@ public class SkinStorage {
 				return;
 			}
 			long creationDate = cs.getLong(name+".timestamp");
-			String uuid = cs.getString(name+".uuid");
 			String propertyname = cs.getString(name+".propertyname");
 			String propertyvalue = cs.getString(name+".propertyvalue");
 			String propertysignature = cs.getString(name+".propertysignature");
 			try {
-				SkinProfile skinData = new SkinProfile(UUID.fromString(uuid), new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
+				SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
 				addSkinData(name, skinData);
 				loadedSkins++;
 			} catch (Exception e) {
@@ -87,7 +87,6 @@ public class SkinStorage {
 		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
 		FileConfiguration data = new YamlConfiguration();
 		for (Entry<String, SkinProfile> entry : getSkinData().entrySet()) {
-			data.set(entry.getKey()+".uuid", entry.getValue().getUUID().toString());
 			data.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
 			data.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
 			data.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());

@@ -1,4 +1,4 @@
-package skinsrestorer.storage;
+package skinsrestorer.shared.format;
 
 public class SkinProperty {
 

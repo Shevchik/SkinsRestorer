@@ -15,23 +15,23 @@
  *
  */
 
-package skinsrestorer.utils;
+package skinsrestorer.shared.utils;
 
 import java.util.UUID;
 
 import org.json.simple.parser.ParseException;
 
 import skinsrestorer.com.mojang.api.profiles.Profile;
-import skinsrestorer.storage.SkinProfile;
-import skinsrestorer.storage.SkinProperty;
+import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.format.SkinProperty;
 
 public class SkinGetUtils {
 
 	public static SkinProfile getSkinProfile(String name) throws SkinFetchFailedException {
 		try {
-			Profile prof = DataUtils.getProfile(name);
-			SkinProperty prop = DataUtils.getProp(prof.getId());
-			return new SkinProfile(uuidFromString(prof.getId()), prop);
+			Profile profile = DataUtils.getProfile(name);
+			SkinProperty prop = DataUtils.getProp(profile.getId());
+			return new SkinProfile(prop);
 		} catch (ParseException e) {
 			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.SKIN_RECODE_FAILED);
 		} catch (SkinFetchFailedException sffe) {

@@ -15,39 +15,31 @@
  *
  */
 
-package skinsrestorer.storage;
+package skinsrestorer.shared.format;
 
-import java.util.UUID;
-
-import org.json.simple.parser.ParseException;
+import skinsrestorer.bukkit.SkinsRestorer;
 
 public class SkinProfile {
 
-	private UUID uuid;
 	private long timestamp;
 	private SkinProperty playerSkinData;
 
-	public SkinProfile(UUID uuid, SkinProperty skinData) throws ParseException {
-		this.uuid = uuid;
+	public SkinProfile(SkinProperty skinData) {
 		timestamp = System.currentTimeMillis();
 		playerSkinData = skinData;
 	}
 
-	public SkinProfile(UUID uuid, SkinProperty skinData, long creationTime) throws ParseException {
-		this(uuid, skinData);
+	public SkinProfile(SkinProperty skinData, long creationTime) {
+		this(skinData);
 		timestamp = creationTime;
 	}
 
 	public boolean isTooDamnOld() {
-		return (System.currentTimeMillis() - timestamp) > (24* 60 * 60 * 1000);
+		return (System.currentTimeMillis() - timestamp) > (SkinsRestorer.getInstance().getConfiguration().getSkinCacheTime() * 1000);
 	}
 
 	public long getCreationDate() {
 		return timestamp;
-	}
-
-	public UUID getUUID() {
-		return uuid;
 	}
 
 	public SkinProperty getPlayerSkinProperty() {
