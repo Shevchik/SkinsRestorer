@@ -81,8 +81,10 @@ public class LoginListener implements Listener {
 
 	private Field profileField = null;
 	private Field getProfileField() throws NoSuchFieldException, SecurityException {
-		this.profileField = InitialHandler.class.getDeclaredField("loginProfile");
-		this.profileField.setAccessible(true);
+		if (this.profileField == null) {
+			this.profileField = InitialHandler.class.getDeclaredField("loginProfile");
+			this.profileField.setAccessible(true);
+		}
 		return this.profileField;
 	}
 
