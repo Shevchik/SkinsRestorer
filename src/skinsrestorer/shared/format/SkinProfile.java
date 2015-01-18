@@ -17,8 +17,6 @@
 
 package skinsrestorer.shared.format;
 
-import skinsrestorer.bukkit.SkinsRestorer;
-
 public class SkinProfile {
 
 	private long timestamp;
@@ -35,7 +33,7 @@ public class SkinProfile {
 	}
 
 	public boolean isTooDamnOld() {
-		return (System.currentTimeMillis() - timestamp) > (SkinsRestorer.getInstance().getConfiguration().getSkinCacheTime() * 1000);
+		return (System.currentTimeMillis() - timestamp) > (2 * 60 * 60 * 1000);
 	}
 
 	public long getCreationDate() {

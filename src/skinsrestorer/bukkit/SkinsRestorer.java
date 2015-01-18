@@ -37,17 +37,16 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 	}
 
 	private Logger log;
-
 	public void logInfo(String message) {
 		log.info(message);
 	}
 
-	private SkinStorage storage;
+	private SkinStorage storage = new SkinStorage();
 	public SkinStorage getSkinStorage() {
 		return storage;
 	}
 
-	private Config configuration;
+	private Config configuration = new Config();
 	public Config getConfiguration() {
 		return configuration;
 	}
@@ -56,9 +55,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 	public void onEnable() {
 		instance = this;
 		log = getLogger();
-		storage = new SkinStorage();
 		storage.loadData();
-		configuration = new Config();
 		configuration.loadConfig();
 		getCommand("skinsrestorer").setExecutor(new Commands());
 		LoginListener loginlistener = new LoginListener();

@@ -15,38 +15,36 @@
  *
  */
 
-package skinsrestorer.shared.format;
+package skinsrestorer.bungee;
 
-public class SkinProperty {
+import java.util.logging.Logger;
 
-	private String name;
-	private String value;
-	private String signature;
+import skinsrestorer.bungee.listeners.LoginListener;
+import skinsrestorer.bungee.storage.SkinStorage;
+import net.md_5.bungee.api.plugin.Plugin;
 
-	public SkinProperty(String name, String value) {
-		this.name = name;
-		this.value = value;
+public class SkinsRestorer extends Plugin {
+
+	private static SkinsRestorer instance;
+	public static SkinsRestorer getInstance() {
+		return instance;
 	}
 
-	public SkinProperty(String name, String value, String signature) {
-		this(name, value);
-		this.signature = signature;
+	private Logger log;
+	public void logInfo(String message) {
+		log.info(message);
 	}
 
-	public String getName() {
-		return name;
+	private SkinStorage storage = new SkinStorage();
+	public SkinStorage getSkinStorage() {
+		return storage;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public boolean hasSignature() {
-		return signature != null;
-	}
-
-	public String getSignature() {
-		return signature;
+	@Override
+	public void onEnable() {
+		instance = this;
+		log = getLogger();
+		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
 	}
 
 }

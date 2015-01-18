@@ -1,0 +1,4 @@
+name: SkinsRestorer
+main: skinsrestorer.bungee.SkinsRestorer
+version: 9.2.dev
+author: _Shevchik_
