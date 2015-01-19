@@ -48,8 +48,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		log = getLogger();
 		storage.loadData();
 		getCommand("skinsrestorer").setExecutor(new Commands());
-		LoginListener loginlistener = new LoginListener();
-		getServer().getPluginManager().registerEvents(loginlistener, this);
+		getServer().getPluginManager().registerEvents(new LoginListener(), this);
 	}
 
 	@Override

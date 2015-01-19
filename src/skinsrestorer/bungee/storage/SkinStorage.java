@@ -17,11 +17,20 @@
 
 package skinsrestorer.bungee.storage;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
+
+import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.format.SkinProperty;
 
 public class SkinStorage {
 
@@ -49,45 +58,45 @@ public class SkinStorage {
 
 	private final long maxHeldSkinDataNumber = 10000;
 
-	/*public void loadData() {
+	public void loadData() {
 		int loadedSkins = 0;
 		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
-		FileConfiguration data = YamlConfiguration.loadConfiguration(datafile);
-		ConfigurationSection cs = data.getConfigurationSection("");
-		if (cs == null) {
-			return;
-		}
-		for (String name : cs.getKeys(false)) {
-			if (loadedSkins >= maxHeldSkinDataNumber) {
-				return;
-			}
-			long creationDate = cs.getLong(name+".timestamp");
-			String propertyname = cs.getString(name+".propertyname");
-			String propertyvalue = cs.getString(name+".propertyvalue");
-			String propertysignature = cs.getString(name+".propertysignature");
+		if (datafile.exists()) {
 			try {
-				SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
-				addSkinData(name, skinData);
-				loadedSkins++;
-			} catch (Exception e) {
+				Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(datafile);
+				for (String name : configuration.getKeys()) {
+					if (loadedSkins >= maxHeldSkinDataNumber) {
+						return;
+					}
+					long creationDate = configuration.getLong(name+".timestamp");
+					String propertyname = configuration.getString(name+".propertyname");
+					String propertyvalue = configuration.getString(name+".propertyvalue");
+					String propertysignature = configuration.getString(name+".propertysignature");
+					SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
+					addSkinData(name, skinData);
+					loadedSkins++;
+				}
+			} catch (IOException e) {
 			}
 		}
 	}
 
 	public void saveData() {
 		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
-		FileConfiguration data = new YamlConfiguration();
+		Configuration configuration = new Configuration();
 		for (Entry<String, SkinProfile> entry : getSkinData().entrySet()) {
-			data.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
-			data.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
-			data.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());
-			data.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinProperty().getSignature());
+			configuration.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
+			configuration.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
+			configuration.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());
+			configuration.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinProperty().getSignature());
 		}
 		try {
-			data.save(datafile);
+			datafile.getParentFile().mkdirs();
+			datafile.createNewFile();
+			ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, datafile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}*/
+	}
 
 }

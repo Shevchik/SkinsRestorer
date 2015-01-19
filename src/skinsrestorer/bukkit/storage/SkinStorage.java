@@ -74,12 +74,9 @@ public class SkinStorage {
 			String propertyname = cs.getString(name+".propertyname");
 			String propertyvalue = cs.getString(name+".propertyvalue");
 			String propertysignature = cs.getString(name+".propertysignature");
-			try {
-				SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
-				addSkinData(name, skinData);
-				loadedSkins++;
-			} catch (Exception e) {
-			}
+			SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
+			addSkinData(name, skinData);
+			loadedSkins++;
 		}
 	}
 

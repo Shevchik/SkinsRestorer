@@ -44,7 +44,14 @@ public class SkinsRestorer extends Plugin {
 	public void onEnable() {
 		instance = this;
 		log = getLogger();
+		storage.loadData();
 		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
+	}
+
+	@Override
+	public void onDisable() {
+		storage.saveData();
+		instance = null;
 	}
 
 }
