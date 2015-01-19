@@ -46,6 +46,7 @@ public class SkinsRestorer extends Plugin {
 		log = getLogger();
 		storage.loadData();
 		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
+		this.getProxy().getPluginManager().registerCommand(this, new Commands());
 	}
 
 	@Override
