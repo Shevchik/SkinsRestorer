@@ -17,12 +17,18 @@
 
 package skinsrestorer.bukkit.listeners;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.utils.SkinGetUtils;
 import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
 
@@ -42,6 +48,20 @@ public class LoginListener implements Listener {
 			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" was succesfully fetched and cached");
 		} catch (SkinFetchFailedException e) {
 			SkinsRestorer.getInstance().logInfo("Skin fetch failed for player "+name+": "+e.getMessage());
+		}
+	}
+
+	//fix skin on player login
+	@EventHandler
+	public void onLoginEvent(PlayerLoginEvent event) {
+		Player player = event.getPlayer();
+		if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(player.getName())) {
+			SkinProperty skinproperty = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName()).getPlayerSkinProperty();
+			WrappedGameProfile wrappedprofile = WrappedGameProfile.fromPlayer(player);
+			WrappedSignedProperty wrappedproperty = WrappedSignedProperty.fromValues(skinproperty.getName(), skinproperty.getValue(), skinproperty.getSignature());
+			if (!wrappedprofile.getProperties().containsKey(wrappedproperty.getName())) {
+				wrappedprofile.getProperties().put(wrappedproperty.getName(), wrappedproperty);
+			}
 		}
 	}
 

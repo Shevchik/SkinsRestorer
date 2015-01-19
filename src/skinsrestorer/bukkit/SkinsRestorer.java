@@ -22,11 +22,7 @@ import java.util.logging.Logger;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import skinsrestorer.bukkit.listeners.IListener;
 import skinsrestorer.bukkit.listeners.LoginListener;
-import skinsrestorer.bukkit.listeners.v_1_7.Version_1_7_Listener;
-import skinsrestorer.bukkit.listeners.v_s_1_8.Version_Spigot_1_8_Listener;
-import skinsrestorer.bukkit.listeners.v_s_p_1_7_1_8.Version_Spigot_Protocol_1_7_1_8_Listener;
 import skinsrestorer.bukkit.storage.SkinStorage;
 
 public class SkinsRestorer extends JavaPlugin implements Listener {
@@ -46,49 +42,20 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		return storage;
 	}
 
-	private Config configuration = new Config();
-	public Config getConfiguration() {
-		return configuration;
-	}
-
 	@Override
 	public void onEnable() {
 		instance = this;
 		log = getLogger();
 		storage.loadData();
-		configuration.loadConfig();
 		getCommand("skinsrestorer").setExecutor(new Commands());
 		LoginListener loginlistener = new LoginListener();
 		getServer().getPluginManager().registerEvents(loginlistener, this);
-		startListeners();
 	}
 
 	@Override
 	public void onDisable() {
 		storage.saveData();
 		instance = null;
-	}
-
-	private IListener versionedListener;
-	public void startListeners() {
-		if (versionedListener != null) {
-			versionedListener.unregister();
-		}
-		switch (configuration.getServerVersion()) {
-			case VERSION_1_7: {
-				versionedListener = new Version_1_7_Listener();
-				break;
-			}
-			case VERSION_SPIGOT_PROTOCOL: {
-				versionedListener = new Version_Spigot_Protocol_1_7_1_8_Listener();
-				break;
-			}
-			case VERSION_SPIGOT_1_8: {
-				versionedListener = new Version_Spigot_1_8_Listener();
-				break;
-			}
-		}
-		versionedListener.register();
 	}
 
 }

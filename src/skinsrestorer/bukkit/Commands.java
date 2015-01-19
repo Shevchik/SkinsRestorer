@@ -60,11 +60,6 @@ public class Commands implements CommandExecutor {
 				}
 			);
 		}
-		if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-			SkinsRestorer.getInstance().getConfiguration().loadConfig();
-			SkinsRestorer.getInstance().startListeners();
-			sender.sendMessage(ChatColor.BLUE+"Configuration reloaded");
-		}
 		return false;
 	}
 
