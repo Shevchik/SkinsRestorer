@@ -27,6 +27,7 @@ public class SkinProfile {
 	};
 
 	private long timestamp;
+	private boolean isForced;
 	private SkinProperty playerSkinData;
 
 	private SkinProfile() {
@@ -37,13 +38,27 @@ public class SkinProfile {
 		playerSkinData = skinData;
 	}
 
-	public SkinProfile(SkinProperty skinData, long creationTime) {
-		this(skinData);
+	public SkinProfile(SkinProperty skinData, boolean isForced) {
+		timestamp = System.currentTimeMillis();
+		playerSkinData = skinData;
+		this.isForced = isForced;
+	}
+
+	public SkinProfile(SkinProperty skinData, long creationTime, boolean isForced) {
+		this(skinData, isForced);
 		timestamp = creationTime;
 	}
 
 	public boolean isValid() {
-		return (System.currentTimeMillis() - timestamp) <= (2 * 60 * 60 * 1000);
+		return (System.currentTimeMillis() - timestamp) <= (2 * 60 * 60 * 1000) || isForced();
+	}
+
+	public boolean isForced() {
+		return isForced;
+	}
+
+	public void setForced() {
+		isForced = true;
 	}
 
 	public long getCreationDate() {

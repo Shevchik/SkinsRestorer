@@ -46,7 +46,11 @@ public class StorageSerializer implements IStorageSerializer {
 			String propertyname = cs.getString(name+".propertyname");
 			String propertyvalue = cs.getString(name+".propertyvalue");
 			String propertysignature = cs.getString(name+".propertysignature");
-			SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
+			if (propertyname == null || propertyvalue == null || propertysignature == null) {
+				continue;
+			}
+			boolean isForced = cs.getBoolean(name+".forced", false);
+			SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate, isForced);
 			profiles.put(name, skinData);
 		}
 		return profiles;
@@ -62,6 +66,7 @@ public class StorageSerializer implements IStorageSerializer {
 			config.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
 			config.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());
 			config.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinProperty().getSignature());
+			config.set(entry.getKey()+".forced", entry.getValue().isForced());
 			saved++;
 			if (saved >= IStorageSerializer.MAX_STORAGE_SIZE) {
 				break;

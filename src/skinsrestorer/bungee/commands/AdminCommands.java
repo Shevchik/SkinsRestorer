@@ -15,52 +15,55 @@
  *
  */
 
-package skinsrestorer.bukkit;
+package skinsrestorer.bungee.commands;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-
+import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
-public class Commands implements CommandExecutor {
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.plugin.Command;
 
-	private ExecutorService executor = Executors.newSingleThreadExecutor();
+public class AdminCommands extends Command {
+
+	public AdminCommands() {
+		super("skinsrestorer", "skinsrestorer.cmds", new String[] {"sr"});
+	}
 
 	@Override
-	public boolean onCommand(final CommandSender sender, Command cmd, String label, final String[] args) {
-		if (!sender.hasPermission("skinsrestorer.cmds")) {
-			sender.sendMessage("You don't have permission to do this");
-			return true;
-		}
+	public void execute(final CommandSender sender, String[] args) {
 		if ((args.length == 2) && args[0].equalsIgnoreCase("drop")) {
 			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(args[1]);
-			sender.sendMessage(ChatColor.BLUE+"Skin data for player "+args[1]+" dropped");
+			TextComponent component = new TextComponent("Skin data for player "+args[1]+" dropped");
+			component.setColor(ChatColor.BLUE);
+			sender.sendMessage(component);
 		} else
 		if ((args.length == 2) && args[0].equalsIgnoreCase("update")) {
-			executor.execute(
+			final String name = args[1];
+			ProxyServer.getInstance().getScheduler().runAsync(
+				SkinsRestorer.getInstance(),
 				new Runnable() {
 					@Override
 					public void run() {
-						String name = args[1];
 						try {
 							SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name);
 							SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
-							sender.sendMessage(ChatColor.BLUE+"Skin data updated");
+							TextComponent component = new TextComponent("Skin data updated");
+							component.setColor(ChatColor.BLUE);
+							sender.sendMessage(component);
 						} catch (SkinFetchFailedException e) {
-							sender.sendMessage(ChatColor.RED+"Skin fetch failed: "+e.getMessage());
+							TextComponent component = new TextComponent("Skin fetch failed: "+e.getMessage());
+							component.setColor(ChatColor.RED);
+							sender.sendMessage(component);
 						}
 					}
 				}
 			);
 		}
-		return false;
 	}
 
 }

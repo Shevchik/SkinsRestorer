@@ -19,6 +19,8 @@ package skinsrestorer.bungee;
 
 import java.util.logging.Logger;
 
+import skinsrestorer.bungee.commands.AdminCommands;
+import skinsrestorer.bungee.commands.PlayerCommands;
 import skinsrestorer.bungee.listeners.LoginListener;
 import skinsrestorer.bungee.storage.StorageSerializer;
 import skinsrestorer.shared.storage.SkinStorage;
@@ -47,7 +49,8 @@ public class SkinsRestorer extends Plugin {
 		log = getLogger();
 		storage.loadData();
 		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
-		this.getProxy().getPluginManager().registerCommand(this, new Commands());
+		this.getProxy().getPluginManager().registerCommand(this, new AdminCommands());
+		this.getProxy().getPluginManager().registerCommand(this, new PlayerCommands());
 	}
 
 	@Override

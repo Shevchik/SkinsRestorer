@@ -17,16 +17,22 @@
 
 package skinsrestorer.bukkit;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import skinsrestorer.bukkit.commands.AdminCommands;
+import skinsrestorer.bukkit.commands.PlayerCommands;
 import skinsrestorer.bukkit.listeners.LoginListener;
 import skinsrestorer.bukkit.storage.StorageSerializer;
 import skinsrestorer.shared.storage.SkinStorage;
 
 public class SkinsRestorer extends JavaPlugin implements Listener {
+
+	public static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	private static SkinsRestorer instance;
 	public static SkinsRestorer getInstance() {
@@ -48,7 +54,8 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		instance = this;
 		log = getLogger();
 		storage.loadData();
-		getCommand("skinsrestorer").setExecutor(new Commands());
+		getCommand("skinsrestorer").setExecutor(new AdminCommands());
+		getCommand("skin").setExecutor(new PlayerCommands());
 		getServer().getPluginManager().registerEvents(new LoginListener(), this);
 	}
 
