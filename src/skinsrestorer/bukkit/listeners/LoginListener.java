@@ -29,21 +29,21 @@ import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
-import skinsrestorer.shared.utils.SkinGetUtils;
-import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
+import skinsrestorer.shared.utils.SkinFetchUtils;
+import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
 public class LoginListener implements Listener {
 
 	//load skin data on async prelogin event
 	@EventHandler
-	public void onPreLoginEvent(AsyncPlayerPreLoginEvent event) {
+	public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(name) && !SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name).isTooDamnOld()) {
+		if (SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name).isValid()) {
 			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" is already cached");
 			return;
 		}
 		try {
-			SkinProfile profile = SkinGetUtils.getSkinProfile(name);
+			SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name);
 			SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
 			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" was succesfully fetched and cached");
 		} catch (SkinFetchFailedException e) {

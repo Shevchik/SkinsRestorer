@@ -19,8 +19,18 @@ package skinsrestorer.shared.format;
 
 public class SkinProfile {
 
+	public static final SkinProfile NONE = new SkinProfile() {
+		@Override
+		public boolean isValid() {
+			return false;
+		}
+	};
+
 	private long timestamp;
 	private SkinProperty playerSkinData;
+
+	private SkinProfile() {
+	}
 
 	public SkinProfile(SkinProperty skinData) {
 		timestamp = System.currentTimeMillis();
@@ -32,8 +42,8 @@ public class SkinProfile {
 		timestamp = creationTime;
 	}
 
-	public boolean isTooDamnOld() {
-		return (System.currentTimeMillis() - timestamp) > (2 * 60 * 60 * 1000);
+	public boolean isValid() {
+		return (System.currentTimeMillis() - timestamp) <= (2 * 60 * 60 * 1000);
 	}
 
 	public long getCreationDate() {

@@ -19,78 +19,56 @@ package skinsrestorer.bukkit.storage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
+import skinsrestorer.shared.storage.IStorageSerializer;
 
-public class SkinStorage {
+public class StorageSerializer implements IStorageSerializer {
 
-	private LinkedHashMap<String, SkinProfile> skins = new LinkedHashMap<String, SkinProfile>(150, 0.75F, true);
-
-	public boolean hasLoadedSkinData(String name) {
-		return skins.containsKey(name.toLowerCase());
-	}
-
-	public void addSkinData(String name, SkinProfile data) {
-		skins.put(name.toLowerCase(), data);
-	}
-
-	public void removeSkinData(String name) {
-		skins.remove(name.toLowerCase());
-	}
-
-	public SkinProfile getLoadedSkinData(String name) {
-		return skins.get(name.toLowerCase());
-	}
-
-	public Map<String, SkinProfile> getSkinData() {
-		return Collections.unmodifiableMap(skins);
-	}
-
-	private final long maxHeldSkinDataNumber = 10000;
-
-	public void loadData() {
-		int loadedSkins = 0;
+	@Override
+	public LinkedHashMap<String, SkinProfile> loadData() {
+		LinkedHashMap<String, SkinProfile> profiles = new LinkedHashMap<String, SkinProfile>();
 		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
-		FileConfiguration data = YamlConfiguration.loadConfiguration(datafile);
+		YamlConfiguration data = YamlConfiguration.loadConfiguration(datafile);
 		ConfigurationSection cs = data.getConfigurationSection("");
 		if (cs == null) {
-			return;
+			return profiles;
 		}
 		for (String name : cs.getKeys(false)) {
-			if (loadedSkins >= maxHeldSkinDataNumber) {
-				return;
-			}
 			long creationDate = cs.getLong(name+".timestamp");
 			String propertyname = cs.getString(name+".propertyname");
 			String propertyvalue = cs.getString(name+".propertyvalue");
 			String propertysignature = cs.getString(name+".propertysignature");
 			SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
-			addSkinData(name, skinData);
-			loadedSkins++;
+			profiles.put(name, skinData);
 		}
+		return profiles;
 	}
 
-	public void saveData() {
+	@Override
+	public void saveData(LinkedHashMap<String, SkinProfile> data) {
+		long saved = 0;
 		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
-		FileConfiguration data = new YamlConfiguration();
-		for (Entry<String, SkinProfile> entry : getSkinData().entrySet()) {
-			data.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
-			data.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
-			data.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());
-			data.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinProperty().getSignature());
+		YamlConfiguration config = new YamlConfiguration();
+		for (Entry<String, SkinProfile> entry : data.entrySet()) {
+			config.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
+			config.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
+			config.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());
+			config.set(entry.getKey()+".propertysignature", entry.getValue().getPlayerSkinProperty().getSignature());
+			saved++;
+			if (saved >= IStorageSerializer.MAX_STORAGE_SIZE) {
+				break;
+			}
 		}
 		try {
-			data.save(datafile);
+			config.save(datafile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

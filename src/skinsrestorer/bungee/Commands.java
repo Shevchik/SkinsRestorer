@@ -1,8 +1,8 @@
 package skinsrestorer.bungee;
 
 import skinsrestorer.shared.format.SkinProfile;
-import skinsrestorer.shared.utils.SkinGetUtils;
-import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
+import skinsrestorer.shared.utils.SkinFetchUtils;
+import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -31,7 +31,7 @@ public class Commands extends Command {
 					@Override
 					public void run() {
 						try {
-							SkinProfile profile = SkinGetUtils.getSkinProfile(name);
+							SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name);
 							SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
 							TextComponent component = new TextComponent("Skin data updated");
 							component.setColor(ChatColor.BLUE);

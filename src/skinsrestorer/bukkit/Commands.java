@@ -26,8 +26,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import skinsrestorer.shared.format.SkinProfile;
-import skinsrestorer.shared.utils.SkinGetUtils;
-import skinsrestorer.shared.utils.SkinGetUtils.SkinFetchFailedException;
+import skinsrestorer.shared.utils.SkinFetchUtils;
+import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
 public class Commands implements CommandExecutor {
 
@@ -50,7 +50,7 @@ public class Commands implements CommandExecutor {
 					public void run() {
 						String name = args[1];
 						try {
-							SkinProfile profile = SkinGetUtils.getSkinProfile(name);
+							SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name);
 							SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
 							sender.sendMessage(ChatColor.BLUE+"Skin data updated");
 						} catch (SkinFetchFailedException e) {
