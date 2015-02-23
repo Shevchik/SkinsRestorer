@@ -32,10 +32,6 @@ public class SkinStorage {
 
 	private LinkedHashMap<String, SkinProfile> skins = new LinkedHashMap<String, SkinProfile>(150, 0.75F, true);
 
-	public boolean hasLoadedSkinData(String name) {
-		return skins.containsKey(name.toLowerCase());
-	}
-
 	public void addSkinData(String name, SkinProfile data) {
 		skins.put(name.toLowerCase(), data);
 	}

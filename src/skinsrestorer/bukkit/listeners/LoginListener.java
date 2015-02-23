@@ -55,8 +55,9 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onLoginEvent(PlayerLoginEvent event) {
 		Player player = event.getPlayer();
-		if (SkinsRestorer.getInstance().getSkinStorage().hasLoadedSkinData(player.getName())) {
-			SkinProperty skinproperty = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName()).getPlayerSkinProperty();
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName());
+		if (skinprofile.isValid()) {
+			SkinProperty skinproperty = skinprofile.getPlayerSkinProperty();
 			WrappedGameProfile wrappedprofile = WrappedGameProfile.fromPlayer(player);
 			WrappedSignedProperty wrappedproperty = WrappedSignedProperty.fromValues(skinproperty.getName(), skinproperty.getValue(), skinproperty.getSignature());
 			if (!wrappedprofile.getProperties().containsKey(wrappedproperty.getName())) {
