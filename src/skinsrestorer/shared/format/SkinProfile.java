@@ -17,6 +17,10 @@
 
 package skinsrestorer.shared.format;
 
+import java.util.UUID;
+
+import skinsrestorer.shared.utils.UUIDUtil;
+
 public class SkinProfile {
 
 	public static final SkinProfile NONE = new SkinProfile() {
@@ -24,29 +28,50 @@ public class SkinProfile {
 		public boolean isValid() {
 			return false;
 		}
+
+		@Override
+		public UUID getUUID() {
+			return null;
+		}
+
+		@Override
+		public String getName() {
+			return null;
+		}
+
+		@Override
+		public long getCreationDate() {
+			return 0;
+		}
+
+		@Override
+		public SkinProperty getPlayerSkinProperty() {
+			return null;
+		}
+
+		@Override
+		public boolean isForced() {
+			return false;
+		}
 	};
 
 	private long timestamp;
 	private boolean isForced;
 	private SkinProperty playerSkinData;
+	private Profile profile;
 
 	private SkinProfile() {
 	}
 
-	public SkinProfile(SkinProperty skinData) {
-		timestamp = System.currentTimeMillis();
-		playerSkinData = skinData;
+	public SkinProfile(Profile profile, SkinProperty skinData) {
+		this.timestamp = System.currentTimeMillis();
+		this.profile = profile;
+		this.playerSkinData = skinData;
 	}
 
-	public SkinProfile(SkinProperty skinData, boolean isForced) {
-		timestamp = System.currentTimeMillis();
-		playerSkinData = skinData;
-		this.isForced = isForced;
-	}
-
-	public SkinProfile(SkinProperty skinData, long creationTime, boolean isForced) {
-		this(skinData, isForced);
-		timestamp = creationTime;
+	public SkinProfile(Profile profile, SkinProperty skinData, long creationTime) {
+		this(profile, skinData);
+		this.timestamp = creationTime;
 	}
 
 	public boolean isValid() {
@@ -67,6 +92,18 @@ public class SkinProfile {
 
 	public SkinProperty getPlayerSkinProperty() {
 		return playerSkinData;
+	}
+
+	public UUID getUUID() {
+		return UUIDUtil.fromDashlessString(profile.getId());
+	}
+
+	public String getName() {
+		return profile.getName();
+	}
+
+	public SkinProfile clone() {
+		return new SkinProfile(profile, playerSkinData, timestamp);
 	}
 
 }

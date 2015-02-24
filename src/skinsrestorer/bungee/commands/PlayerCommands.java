@@ -56,7 +56,12 @@ public class PlayerCommands extends Command {
 					public void run() {
 						String from = args[1];
 						try {
-							SkinProfile skinprofile = SkinFetchUtils.fetchSkinProfile(from);
+							SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(from);
+							if (skinprofile.isValid() && !skinprofile.isForced()) {
+								skinprofile = skinprofile.clone();
+							} else {
+								skinprofile = SkinFetchUtils.fetchSkinProfile(from, skinprofile.getUUID());
+							}
 							skinprofile.setForced();
 							SkinsRestorer.getInstance().getSkinStorage().addSkinData(player.getName(), skinprofile);
 							TextComponent component = new TextComponent("Your skin has been updated, relog to see changes");

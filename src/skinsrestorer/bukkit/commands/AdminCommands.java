@@ -47,7 +47,7 @@ public class AdminCommands implements CommandExecutor {
 					public void run() {
 						String name = args[1];
 						try {
-							SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name);
+							SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name, null);
 							SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
 							sender.sendMessage(ChatColor.BLUE+"Skin data updated");
 						} catch (SkinFetchFailedException e) {

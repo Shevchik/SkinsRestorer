@@ -15,20 +15,24 @@
  *
  */
 
-package skinsrestorer.shared.storage;
+package skinsrestorer.shared.format;
 
-import java.util.LinkedHashMap;
+public class Profile {
 
-import skinsrestorer.shared.format.SkinProfile;
+	private String id;
+	private String name;
 
-public interface IStorageSerializer {
+	public Profile(String id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-	public static final int MAX_STORAGE_SIZE = 10000;
+	public String getId() {
+		return id;
+	}
 
-	public static final String STORAGE_FILE_NAME = "cache.yml";
-
-	public LinkedHashMap<String, SkinProfile> loadData();
-
-	public void saveData(LinkedHashMap<String, SkinProfile> data);
+	public String getName() {
+		return name;
+	}
 
 }

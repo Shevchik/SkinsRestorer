@@ -50,7 +50,7 @@ public class AdminCommands extends Command {
 					@Override
 					public void run() {
 						try {
-							SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name);
+							SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name, null);
 							SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
 							TextComponent component = new TextComponent("Skin data updated");
 							component.setColor(ChatColor.BLUE);

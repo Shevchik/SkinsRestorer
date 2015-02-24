@@ -30,6 +30,8 @@ import skinsrestorer.libs.org.json.simple.JSONArray;
 import skinsrestorer.libs.org.json.simple.JSONObject;
 import skinsrestorer.libs.org.json.simple.parser.JSONParser;
 import skinsrestorer.libs.org.json.simple.parser.ParseException;
+import skinsrestorer.shared.format.Profile;
+import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 import skinsrestorer.shared.utils.apacheutils.IOUtils;
@@ -64,7 +66,7 @@ public class MojangAPI {
 	}
 
 	private static final String skullbloburl = "https://sessionserver.mojang.com/session/minecraft/profile/";
-	public static SkinProperty getSkinProperty(String id) throws IOException, ParseException, SkinFetchFailedException {
+	public static SkinProfile getSkinProfile(String id) throws IOException, ParseException, SkinFetchFailedException {
 		//open connection
 		HttpURLConnection connection =  (HttpURLConnection) setupConnection(new URL(skullbloburl+id.replace("-", "")+"?unsigned=false"));
 		//check response code
@@ -75,14 +77,16 @@ public class MojangAPI {
 		InputStream is = connection.getInputStream();
 		String result = IOUtils.toString(is, StandardCharsets.UTF_8);
 		IOUtils.closeQuietly(is);
-		JSONArray properties = (JSONArray) ((JSONObject) new JSONParser().parse(result)).get("properties");
+		JSONObject obj = (JSONObject) new JSONParser().parse(result);
+		String username = (String) obj.get("name");
+		JSONArray properties = (JSONArray) (obj).get("properties");
 		for (int i = 0; i < properties.size(); i++) {
 			JSONObject property = (JSONObject) properties.get(i);
 			String name = (String) property.get("name");
 			String value = (String) property.get("value");
 			String signature = (String) property.get("signature");
 			if (name.equals("textures")) {
-				return new SkinProperty(name, value, signature);
+				return new SkinProfile(new Profile(id, username), new SkinProperty(name, value, signature));
 			}
 		}
 		throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_SKIN_DATA);
@@ -96,26 +100,6 @@ public class MojangAPI {
 		connection.setDoInput(true);
 		connection.setDoOutput(true);
 		return connection;
-	}
-
-	public static class Profile {
-
-		private String id;
-		private String name;
-
-		public Profile(String id, String name) {
-			this.id = id;
-			this.name = name;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		public String getName() {
-			return name;
-		}
-
 	}
 
 }

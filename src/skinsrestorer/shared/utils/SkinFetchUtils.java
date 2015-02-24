@@ -17,18 +17,27 @@
 
 package skinsrestorer.shared.utils;
 
+import java.util.UUID;
+
 import skinsrestorer.libs.org.json.simple.parser.ParseException;
+import skinsrestorer.shared.format.Profile;
 import skinsrestorer.shared.format.SkinProfile;
-import skinsrestorer.shared.format.SkinProperty;
-import skinsrestorer.shared.utils.MojangAPI.Profile;
 
 public class SkinFetchUtils {
 
-	public static SkinProfile fetchSkinProfile(String name) throws SkinFetchFailedException {
+	public static SkinProfile fetchSkinProfile(String name, UUID uuid) throws SkinFetchFailedException {
 		try {
+			if (uuid != null) {
+				try {
+					SkinProfile skinprofile = MojangAPI.getSkinProfile(uuid.toString());
+					if (skinprofile.getName().equalsIgnoreCase(name)) {
+						return skinprofile;
+					}
+				} catch (SkinFetchFailedException ex) {
+				}
+			}
 			Profile profile = MojangAPI.getProfile(name);
-			SkinProperty property = MojangAPI.getSkinProperty(profile.getId());
-			return new SkinProfile(property);
+			return MojangAPI.getSkinProfile(profile.getId());
 		} catch (ParseException e) {
 			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.SKIN_RECODE_FAILED);
 		} catch (SkinFetchFailedException sffe) {

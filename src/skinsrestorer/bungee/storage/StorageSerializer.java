@@ -27,6 +27,7 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
 import skinsrestorer.bungee.SkinsRestorer;
+import skinsrestorer.shared.format.Profile;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.storage.IStorageSerializer;
@@ -36,19 +37,21 @@ public class StorageSerializer implements IStorageSerializer {
 	@Override
 	public LinkedHashMap<String, SkinProfile> loadData() {
 		LinkedHashMap<String, SkinProfile> profiles = new LinkedHashMap<String, SkinProfile>();
-		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
+		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), IStorageSerializer.STORAGE_FILE_NAME);
 		try {
 			Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(datafile);
 			for (String name : configuration.getKeys()) {
+				String username = configuration.getString(name+".username");
+				String uuid = configuration.getString(name+".uuid");
 				long creationDate = configuration.getLong(name+".timestamp");
 				String propertyname = configuration.getString(name+".propertyname");
 				String propertyvalue = configuration.getString(name+".propertyvalue");
 				String propertysignature = configuration.getString(name+".propertysignature");
-				if (propertyname == null || propertyvalue == null || propertysignature == null) {
-					continue;
+				boolean isForced = configuration.getBoolean(name+".forced");
+				SkinProfile skinData = new SkinProfile(new Profile(uuid.replace("-", ""), username), new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
+				if (isForced) {
+					skinData.setForced();
 				}
-				boolean isForced = configuration.getBoolean(name+".forced", false);
-				SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate, isForced);
 				profiles.put(name, skinData);
 			}
 		} catch (IOException e) {
@@ -59,9 +62,11 @@ public class StorageSerializer implements IStorageSerializer {
 	@Override
 	public void saveData(LinkedHashMap<String, SkinProfile> data) {
 		long saved = 0;
-		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
+		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), IStorageSerializer.STORAGE_FILE_NAME);
 		Configuration configuration = new Configuration();
 		for (Entry<String, SkinProfile> entry : data.entrySet()) {
+			configuration.set(entry.getKey()+".username", entry.getValue().getName());
+			configuration.set(entry.getKey()+".uuid", entry.getValue().getUUID().toString());
 			configuration.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
 			configuration.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
 			configuration.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());

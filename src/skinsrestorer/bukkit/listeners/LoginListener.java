@@ -38,12 +38,13 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		if (SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name).isValid()) {
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
+		if (skinprofile.isValid()) {
 			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" is already cached");
 			return;
 		}
 		try {
-			SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name);
+			SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name, skinprofile.getUUID());
 			SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
 			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" was succesfully fetched and cached");
 		} catch (SkinFetchFailedException e) {

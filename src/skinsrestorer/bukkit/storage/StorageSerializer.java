@@ -26,6 +26,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import skinsrestorer.bukkit.SkinsRestorer;
+import skinsrestorer.shared.format.Profile;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.storage.IStorageSerializer;
@@ -35,22 +36,24 @@ public class StorageSerializer implements IStorageSerializer {
 	@Override
 	public LinkedHashMap<String, SkinProfile> loadData() {
 		LinkedHashMap<String, SkinProfile> profiles = new LinkedHashMap<String, SkinProfile>();
-		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
+		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), IStorageSerializer.STORAGE_FILE_NAME);
 		YamlConfiguration data = YamlConfiguration.loadConfiguration(datafile);
 		ConfigurationSection cs = data.getConfigurationSection("");
 		if (cs == null) {
 			return profiles;
 		}
 		for (String name : cs.getKeys(false)) {
+			String username = cs.getString(name+".username");
+			String uuid = cs.getString(name+".uuid");
 			long creationDate = cs.getLong(name+".timestamp");
 			String propertyname = cs.getString(name+".propertyname");
 			String propertyvalue = cs.getString(name+".propertyvalue");
 			String propertysignature = cs.getString(name+".propertysignature");
-			if (propertyname == null || propertyvalue == null || propertysignature == null) {
-				continue;
-			}
 			boolean isForced = cs.getBoolean(name+".forced", false);
-			SkinProfile skinData = new SkinProfile(new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate, isForced);
+			SkinProfile skinData = new SkinProfile(new Profile(uuid.replace("-", ""), username), new SkinProperty(propertyname, propertyvalue, propertysignature), creationDate);
+			if (isForced) {
+				skinData.setForced();
+			}
 			profiles.put(name, skinData);
 		}
 		return profiles;
@@ -59,9 +62,11 @@ public class StorageSerializer implements IStorageSerializer {
 	@Override
 	public void saveData(LinkedHashMap<String, SkinProfile> data) {
 		long saved = 0;
-		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), "data.yml");
+		File datafile = new File(SkinsRestorer.getInstance().getDataFolder(), IStorageSerializer.STORAGE_FILE_NAME);
 		YamlConfiguration config = new YamlConfiguration();
 		for (Entry<String, SkinProfile> entry : data.entrySet()) {
+			config.set(entry.getKey()+".username", entry.getValue().getName());
+			config.set(entry.getKey()+".uuid", entry.getValue().getUUID().toString());
 			config.set(entry.getKey()+".timestamp", entry.getValue().getCreationDate());
 			config.set(entry.getKey()+".propertyname", entry.getValue().getPlayerSkinProperty().getName());
 			config.set(entry.getKey()+".propertyvalue", entry.getValue().getPlayerSkinProperty().getValue());
