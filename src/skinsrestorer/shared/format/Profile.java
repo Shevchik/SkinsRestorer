@@ -17,7 +17,7 @@
 
 package skinsrestorer.shared.format;
 
-public class Profile {
+public class Profile implements Cloneable {
 
 	private String id;
 	private String name;
@@ -33,6 +33,11 @@ public class Profile {
 
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public Profile clone() {
+		return new Profile(new String(id.toCharArray()), new String(name.toCharArray()));
 	}
 
 }

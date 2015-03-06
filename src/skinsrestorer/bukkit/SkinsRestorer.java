@@ -27,7 +27,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import skinsrestorer.bukkit.commands.AdminCommands;
 import skinsrestorer.bukkit.commands.PlayerCommands;
 import skinsrestorer.bukkit.listeners.LoginListener;
-import skinsrestorer.bukkit.storage.StorageSerializer;
 import skinsrestorer.shared.storage.SkinStorage;
 
 public class SkinsRestorer extends JavaPlugin implements Listener {
@@ -44,7 +43,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		log.info(message);
 	}
 
-	private SkinStorage storage = new SkinStorage(new StorageSerializer());
+	private SkinStorage storage = new SkinStorage(getDataFolder());
 	public SkinStorage getSkinStorage() {
 		return storage;
 	}

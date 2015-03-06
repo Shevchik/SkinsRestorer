@@ -17,20 +17,38 @@
 
 package skinsrestorer.shared.storage;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import skinsrestorer.libs.com.google.gson.Gson;
+import skinsrestorer.libs.com.google.gson.GsonBuilder;
+import skinsrestorer.libs.com.google.gson.JsonIOException;
+import skinsrestorer.libs.com.google.gson.reflect.TypeToken;
 import skinsrestorer.shared.format.SkinProfile;
 
 public class SkinStorage {
 
-	private IStorageSerializer serializer;
-	public SkinStorage(IStorageSerializer serializer) {
-		this.serializer = serializer;
+	private static final String cachefile = "cache.json";
+	private static final Gson gson =
+		new GsonBuilder()
+		.registerTypeHierarchyAdapter(SkinProfile.class, new SkinProfile.GsonTypeAdapter())
+		.setPrettyPrinting()
+		.create();
+	private static final Type type = new TypeToken<ConcurrentHashMap<String, SkinProfile>>(){}.getType();
+
+	private File pluginfolder;
+
+	public SkinStorage(File pluginfolder) {
+		this.pluginfolder = pluginfolder;
 	}
 
-	private LinkedHashMap<String, SkinProfile> skins = new LinkedHashMap<String, SkinProfile>(150, 0.75F, true);
+	private ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();
 
 	public void addSkinData(String name, SkinProfile data) {
 		skins.put(name.toLowerCase(), data);
@@ -51,11 +69,22 @@ public class SkinStorage {
 
 
 	public void loadData() {
-		skins.putAll(serializer.loadData());
+		try {
+			Map<String, SkinProfile> gsondata = gson.fromJson(new FileReader(new File(pluginfolder, cachefile)), type);
+			if (gsondata != null) {
+				skins.putAll(gsondata);
+			}
+		} catch (JsonIOException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void saveData() {
-		serializer.saveData(skins);
+		try (FileWriter writer = new FileWriter(new File(pluginfolder, cachefile))) {
+			writer.write(gson.toJson(skins, type));
+		} catch (JsonIOException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

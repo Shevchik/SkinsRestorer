@@ -17,19 +17,15 @@
 
 package skinsrestorer.shared.format;
 
-public class SkinProperty {
+public class SkinProperty implements Cloneable {
 
 	private String name;
 	private String value;
 	private String signature;
 
-	public SkinProperty(String name, String value) {
+	public SkinProperty(String name, String value, String signature) {
 		this.name = name;
 		this.value = value;
-	}
-
-	public SkinProperty(String name, String value, String signature) {
-		this(name, value);
 		this.signature = signature;
 	}
 
@@ -47,6 +43,11 @@ public class SkinProperty {
 
 	public String getSignature() {
 		return signature;
+	}
+
+	@Override
+	public SkinProperty clone() {
+		return new SkinProperty(new String(name.toCharArray()), new String(value.toCharArray()), new String(signature.toCharArray()));
 	}
 
 }

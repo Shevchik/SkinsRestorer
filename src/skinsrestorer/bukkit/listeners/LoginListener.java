@@ -23,10 +23,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+import skinsrestorer.bukkit.SkinsRestorer;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
-
-import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.utils.SkinFetchUtils;
@@ -58,7 +57,7 @@ public class LoginListener implements Listener {
 		Player player = event.getPlayer();
 		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName());
 		if (skinprofile.isValid()) {
-			SkinProperty skinproperty = skinprofile.getPlayerSkinProperty();
+			SkinProperty skinproperty = skinprofile.getSkin();
 			WrappedGameProfile wrappedprofile = WrappedGameProfile.fromPlayer(player);
 			WrappedSignedProperty wrappedproperty = WrappedSignedProperty.fromValues(skinproperty.getName(), skinproperty.getValue(), skinproperty.getSignature());
 			if (!wrappedprofile.getProperties().containsKey(wrappedproperty.getName())) {

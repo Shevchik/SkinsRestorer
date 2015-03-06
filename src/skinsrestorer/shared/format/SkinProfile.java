@@ -17,13 +17,22 @@
 
 package skinsrestorer.shared.format;
 
+import java.lang.reflect.Type;
 import java.util.UUID;
 
+import skinsrestorer.libs.com.google.gson.JsonDeserializationContext;
+import skinsrestorer.libs.com.google.gson.JsonDeserializer;
+import skinsrestorer.libs.com.google.gson.JsonElement;
+import skinsrestorer.libs.com.google.gson.JsonObject;
+import skinsrestorer.libs.com.google.gson.JsonParseException;
+import skinsrestorer.libs.com.google.gson.JsonPrimitive;
+import skinsrestorer.libs.com.google.gson.JsonSerializationContext;
+import skinsrestorer.libs.com.google.gson.JsonSerializer;
 import skinsrestorer.shared.utils.UUIDUtil;
 
-public class SkinProfile {
+public class SkinProfile implements Cloneable {
 
-	public static final SkinProfile NONE = new SkinProfile() {
+	public static final transient SkinProfile NONE = new SkinProfile() {
 		@Override
 		public boolean isValid() {
 			return false;
@@ -45,7 +54,7 @@ public class SkinProfile {
 		}
 
 		@Override
-		public SkinProperty getPlayerSkinProperty() {
+		public SkinProperty getSkin() {
 			return null;
 		}
 
@@ -57,21 +66,17 @@ public class SkinProfile {
 
 	private long timestamp;
 	private boolean isForced;
-	private SkinProperty playerSkinData;
 	private Profile profile;
+	private SkinProperty skin;
 
 	private SkinProfile() {
 	}
 
-	public SkinProfile(Profile profile, SkinProperty skinData) {
-		this.timestamp = System.currentTimeMillis();
+	public SkinProfile(Profile profile, SkinProperty skinData, long creationTime, boolean isForced) {
 		this.profile = profile;
-		this.playerSkinData = skinData;
-	}
-
-	public SkinProfile(Profile profile, SkinProperty skinData, long creationTime) {
-		this(profile, skinData);
+		this.skin = skinData;
 		this.timestamp = creationTime;
+		this.isForced = isForced;
 	}
 
 	public boolean isValid() {
@@ -82,16 +87,12 @@ public class SkinProfile {
 		return isForced;
 	}
 
-	public void setForced() {
-		isForced = true;
-	}
-
 	public long getCreationDate() {
 		return timestamp;
 	}
 
-	public SkinProperty getPlayerSkinProperty() {
-		return playerSkinData;
+	public SkinProperty getSkin() {
+		return skin;
 	}
 
 	public UUID getUUID() {
@@ -102,8 +103,47 @@ public class SkinProfile {
 		return profile.getName();
 	}
 
+	public SkinProfile cloneAsForced() {
+		return new SkinProfile(profile.clone(), skin, timestamp, true);
+	}
+
+	@Override
 	public SkinProfile clone() {
-		return new SkinProfile(profile, playerSkinData, timestamp);
+		return new SkinProfile(profile.clone(), skin, timestamp, isForced);
+	}
+
+
+	public static class GsonTypeAdapter implements JsonSerializer<SkinProfile>, JsonDeserializer<SkinProfile> {
+
+		@Override
+		public SkinProfile deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			JsonObject profile = json.getAsJsonObject().get("profile").getAsJsonObject();
+			JsonObject skin = json.getAsJsonObject().get("skin").getAsJsonObject();
+			return new SkinProfile(
+				new Profile(profile.get("uuid").getAsString(), profile.get("name").getAsString()),
+				new SkinProperty(skin.get("name").getAsString(), skin.get("value").getAsString(), skin.get("signature").getAsString()),
+				json.getAsJsonObject().get("created").getAsLong(),
+				json.getAsJsonObject().get("forced").getAsBoolean()
+			);
+		}
+
+		@Override
+		public JsonElement serialize(SkinProfile src, Type typeOfSrc, JsonSerializationContext context) {
+			JsonObject object = new JsonObject();
+			object.add("created", new JsonPrimitive(src.timestamp));
+			object.add("forced", new JsonPrimitive(src.isForced));
+			JsonObject profile = new JsonObject();
+			profile.add("uuid", new JsonPrimitive(src.profile.getId()));
+			profile.add("name", new JsonPrimitive(src.profile.getName()));
+			object.add("profile", profile);
+			JsonObject skin = new JsonObject();
+			skin.add("name", new JsonPrimitive(src.skin.getName()));
+			skin.add("value", new JsonPrimitive(src.skin.getValue()));
+			skin.add("signature", new JsonPrimitive(src.skin.getSignature()));
+			object.add("skin", skin);
+			return object;
+		}
+
 	}
 
 }

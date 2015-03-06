@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import skinsrestorer.bungee.commands.AdminCommands;
 import skinsrestorer.bungee.commands.PlayerCommands;
 import skinsrestorer.bungee.listeners.LoginListener;
-import skinsrestorer.bungee.storage.StorageSerializer;
 import skinsrestorer.shared.storage.SkinStorage;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -38,7 +37,7 @@ public class SkinsRestorer extends Plugin {
 		log.info(message);
 	}
 
-	private SkinStorage storage = new SkinStorage(new StorageSerializer());
+	private SkinStorage storage = new SkinStorage(getDataFolder());
 	public SkinStorage getSkinStorage() {
 		return storage;
 	}

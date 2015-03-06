@@ -83,7 +83,7 @@ public class LoginListener implements Listener {
 		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
 		if (skinprofile.isValid()) {
 			try {
-				SkinProperty skinproperty = skinprofile.getPlayerSkinProperty();
+				SkinProperty skinproperty = skinprofile.getSkin();
 				InitialHandler handler = (InitialHandler) event.getPlayer().getPendingConnection();
 				Property[] properties = new Property[1];
 				properties[0] = new Property(skinproperty.getName(), skinproperty.getValue(), skinproperty.getSignature());

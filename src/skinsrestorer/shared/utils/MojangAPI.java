@@ -86,7 +86,7 @@ public class MojangAPI {
 			String value = (String) property.get("value");
 			String signature = (String) property.get("signature");
 			if (name.equals("textures")) {
-				return new SkinProfile(new Profile(id, username), new SkinProperty(name, value, signature));
+				return new SkinProfile(new Profile(id, username), new SkinProperty(name, value, signature), System.currentTimeMillis(), false);
 			}
 		}
 		throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_SKIN_DATA);
