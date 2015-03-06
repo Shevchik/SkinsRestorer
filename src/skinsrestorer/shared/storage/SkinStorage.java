@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import skinsrestorer.libs.com.google.gson.Gson;
@@ -81,7 +82,13 @@ public class SkinStorage {
 
 	public void saveData() {
 		try (FileWriter writer = new FileWriter(new File(pluginfolder, cachefile))) {
-			writer.write(gson.toJson(skins, type));
+			ConcurrentHashMap<String, SkinProfile> serialize = new ConcurrentHashMap<String, SkinProfile>();
+			for (Entry<String, SkinProfile> entry : skins.entrySet()) {
+				if (entry.getValue().isForced() || System.currentTimeMillis() - entry.getValue().getCreationDate() < 30 * 24 * 60 * 60 * 1000) {
+					serialize.put(entry.getKey(), entry.getValue());
+				}
+			}
+			writer.write(gson.toJson(serialize, type));
 		} catch (JsonIOException | IOException e) {
 			e.printStackTrace();
 		}
