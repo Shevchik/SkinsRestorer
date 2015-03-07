@@ -76,7 +76,6 @@ public class SkinStorage {
 				skins.putAll(gsondata);
 			}
 		} catch (JsonIOException | IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -90,7 +89,6 @@ public class SkinStorage {
 			}
 			writer.write(gson.toJson(serialize, type));
 		} catch (JsonIOException | IOException e) {
-			e.printStackTrace();
 		}
 	}
 
