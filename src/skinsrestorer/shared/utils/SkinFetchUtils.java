@@ -51,12 +51,20 @@ public class SkinFetchUtils {
 
 		private static final long serialVersionUID = -7597517818949217019L;
 
+		private Reason reason;
+
 		public SkinFetchFailedException(Reason reason) {
 			super(reason.getExceptionCause()); 
+			this.reason = reason;
 		}
 
 		public SkinFetchFailedException(Throwable exception) {
 			super(Reason.GENERIC_ERROR.getExceptionCause()+": "+exception.getClass().getName()+": "+exception.getMessage(), exception); 
+			this.reason = Reason.GENERIC_ERROR;
+		}
+
+		public Reason getReason() {
+			return reason;
 		}
 
 		public static enum Reason {
