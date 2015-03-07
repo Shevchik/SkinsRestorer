@@ -84,7 +84,7 @@ public class SkinStorage {
 		try (FileWriter writer = new FileWriter(new File(pluginfolder, cachefile))) {
 			ConcurrentHashMap<String, SkinProfile> serialize = new ConcurrentHashMap<String, SkinProfile>();
 			for (Entry<String, SkinProfile> entry : skins.entrySet()) {
-				if (entry.getValue().isForced() || System.currentTimeMillis() - entry.getValue().getCreationDate() < 30 * 24 * 60 * 60 * 1000) {
+				if (System.currentTimeMillis() - entry.getValue().getCreationDate() < 30 * 24 * 60 * 60 * 1000) {
 					serialize.put(entry.getKey(), entry.getValue());
 				}
 			}
