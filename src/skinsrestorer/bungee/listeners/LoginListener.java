@@ -24,7 +24,6 @@ import java.lang.reflect.Field;
 import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
-import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -54,19 +53,13 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onPreLogin(final LoginEvent event) {
 		final String name = event.getConnection().getName();
-		final SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-		if (skinprofile.isValid()) {
-			SkinsRestorer.getInstance().logInfo("Skin for player " + name + " is already cached");
-			return;
-		}
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(name);
 		event.registerIntent(SkinsRestorer.getInstance());
 		ProxyServer.getInstance().getScheduler().runAsync(SkinsRestorer.getInstance(), new Runnable() {
 			@Override
 			public void run() {
 				try {
-					SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name, skinprofile.getUUID());
-					SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
-					SkinsRestorer.getInstance().logInfo("Skin for player " + name + " was succesfully fetched and cached");
+					skinprofile.attemptUpdate(name);
 				} catch (SkinFetchFailedException e) {
 					SkinsRestorer.getInstance().logInfo("Skin fetch failed for player " + name + ": " + e.getMessage());
 				} finally {
@@ -80,19 +73,21 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onPostLogin(PostLoginEvent event) {
 		String name = event.getPlayer().getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-		if (skinprofile.isValid()) {
-			try {
-				SkinProperty skinproperty = skinprofile.getSkin();
-				InitialHandler handler = (InitialHandler) event.getPlayer().getPendingConnection();
-				Property[] properties = new Property[1];
-				properties[0] = new Property(skinproperty.getName(), skinproperty.getValue(), skinproperty.getSignature());
-				LoginResult profile = new LoginResult(event.getPlayer().getUniqueId().toString(), properties);
-				profileFieldSetter.invokeExact(handler, profile);
-			} catch (Throwable t) {
-				t.printStackTrace();
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(name);
+		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
+			@Override
+			public void applySkin(SkinProperty property) {
+				try {
+					InitialHandler handler = (InitialHandler) event.getPlayer().getPendingConnection();
+					Property[] properties = new Property[1];
+					properties[0] = new Property(property.getName(), property.getValue(), property.getSignature());
+					LoginResult profile = new LoginResult(event.getPlayer().getUniqueId().toString(), properties);
+					profileFieldSetter.invokeExact(handler, profile);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
 			}
-		}
+		});
 	}
 
 }

@@ -52,12 +52,7 @@ public class PlayerCommands implements CommandExecutor {
 					public void run() {
 						String from = args[1];
 						try {
-							SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(from);
-							if (skinprofile.isValid() && !skinprofile.isForced()) {
-								skinprofile = skinprofile.cloneAsForced();
-							} else {
-								skinprofile = SkinFetchUtils.fetchSkinProfile(from, skinprofile.getUUID());
-							}
+							SkinProfile skinprofile = SkinFetchUtils.fetchSkinProfile(from, null);
 							SkinsRestorer.getInstance().getSkinStorage().addSkinData(player.getName(), skinprofile);
 							player.sendMessage(ChatColor.BLUE+"Your skin has been updated, relog to see changes");
 						} catch (SkinFetchFailedException e) {

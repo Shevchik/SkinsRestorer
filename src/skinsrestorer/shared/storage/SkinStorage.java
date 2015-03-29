@@ -31,16 +31,13 @@ import skinsrestorer.libs.com.google.gson.Gson;
 import skinsrestorer.libs.com.google.gson.GsonBuilder;
 import skinsrestorer.libs.com.google.gson.JsonIOException;
 import skinsrestorer.libs.com.google.gson.reflect.TypeToken;
+import skinsrestorer.shared.format.LocalAccess;
 import skinsrestorer.shared.format.SkinProfile;
 
 public class SkinStorage {
 
 	private static final String cachefile = "cache.json";
-	private static final Gson gson =
-		new GsonBuilder()
-		.registerTypeHierarchyAdapter(SkinProfile.class, new SkinProfile.GsonTypeAdapter())
-		.setPrettyPrinting()
-		.create();
+	private static final Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(SkinProfile.class, new SkinProfile.GsonTypeAdapter()).setPrettyPrinting().create();
 	private static final Type type = new TypeToken<ConcurrentHashMap<String, SkinProfile>>(){}.getType();
 
 	private File pluginfolder;
@@ -51,17 +48,22 @@ public class SkinStorage {
 
 	private ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();
 
-	public void addSkinData(String name, SkinProfile data) {
-		skins.put(name.toLowerCase(), data);
-	}
-
 	public void removeSkinData(String name) {
 		skins.remove(name.toLowerCase());
 	}
 
-	public SkinProfile getLoadedSkinData(String name) {
-		SkinProfile profile = skins.get(name.toLowerCase()); 
-		return profile != null ? profile : SkinProfile.NONE;
+	public void addSkinData(String name, SkinProfile profile) {
+		skins.put(name.toLowerCase(), profile);
+	}
+
+	public SkinProfile getSkinData(String name) {
+		SkinProfile cachedprofile = skins.get(name.toLowerCase());
+		if (cachedprofile != null) {
+			return cachedprofile;
+		}
+		SkinProfile emptyprofile = new SkinProfile(null, null, 0, false);
+		skins.put(name.toLowerCase(), emptyprofile);
+		return emptyprofile;
 	}
 
 	public Map<String, SkinProfile> getSkinData() {
@@ -83,7 +85,7 @@ public class SkinStorage {
 		try (FileWriter writer = new FileWriter(new File(pluginfolder, cachefile))) {
 			ConcurrentHashMap<String, SkinProfile> serialize = new ConcurrentHashMap<String, SkinProfile>();
 			for (Entry<String, SkinProfile> entry : skins.entrySet()) {
-				if (System.currentTimeMillis() - entry.getValue().getCreationDate() < 30 * 24 * 60 * 60 * 1000) {
+				if (LocalAccess.shouldSerialize(entry.getValue())) {
 					serialize.put(entry.getKey(), entry.getValue());
 				}
 			}

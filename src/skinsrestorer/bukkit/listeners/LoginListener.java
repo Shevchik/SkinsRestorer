@@ -24,11 +24,12 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 import skinsrestorer.bukkit.SkinsRestorer;
+
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
+
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
-import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
 public class LoginListener implements Listener {
@@ -37,15 +38,9 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(name);
-		if (skinprofile.isValid()) {
-			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" is already cached");
-			return;
-		}
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(name);
 		try {
-			SkinProfile profile = SkinFetchUtils.fetchSkinProfile(name, skinprofile.getUUID());
-			SkinsRestorer.getInstance().getSkinStorage().addSkinData(name, profile);
-			SkinsRestorer.getInstance().logInfo("Skin for player "+name+" was succesfully fetched and cached");
+			skinprofile.attemptUpdate(name);
 		} catch (SkinFetchFailedException e) {
 			SkinsRestorer.getInstance().logInfo("Skin fetch failed for player "+name+": "+e.getMessage());
 		}
@@ -55,15 +50,17 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onLoginEvent(PlayerLoginEvent event) {
 		Player player = event.getPlayer();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getLoadedSkinData(player.getName());
-		if (skinprofile.isValid()) {
-			SkinProperty skinproperty = skinprofile.getSkin();
-			WrappedGameProfile wrappedprofile = WrappedGameProfile.fromPlayer(player);
-			WrappedSignedProperty wrappedproperty = WrappedSignedProperty.fromValues(skinproperty.getName(), skinproperty.getValue(), skinproperty.getSignature());
-			if (!wrappedprofile.getProperties().containsKey(wrappedproperty.getName())) {
-				wrappedprofile.getProperties().put(wrappedproperty.getName(), wrappedproperty);
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(player.getName());
+		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
+			@Override
+			public void applySkin(SkinProperty property) {
+				WrappedGameProfile wrappedprofile = WrappedGameProfile.fromPlayer(player);
+				WrappedSignedProperty wrappedproperty = WrappedSignedProperty.fromValues(property.getName(), property.getValue(), property.getSignature());
+				if (!wrappedprofile.getProperties().containsKey(wrappedproperty.getName())) {
+					wrappedprofile.getProperties().put(wrappedproperty.getName(), wrappedproperty);
+				}
 			}
-		}
+		});
 	}
 
 }

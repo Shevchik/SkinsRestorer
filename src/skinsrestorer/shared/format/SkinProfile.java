@@ -28,49 +28,17 @@ import skinsrestorer.libs.com.google.gson.JsonParseException;
 import skinsrestorer.libs.com.google.gson.JsonPrimitive;
 import skinsrestorer.libs.com.google.gson.JsonSerializationContext;
 import skinsrestorer.libs.com.google.gson.JsonSerializer;
+import skinsrestorer.shared.utils.SkinFetchUtils;
+import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
+import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException.Reason;
 import skinsrestorer.shared.utils.UUIDUtil;
 
 public class SkinProfile implements Cloneable {
 
-	public static final transient SkinProfile NONE = new SkinProfile() {
-		@Override
-		public boolean isValid() {
-			return false;
-		}
-
-		@Override
-		public UUID getUUID() {
-			return null;
-		}
-
-		@Override
-		public String getName() {
-			return null;
-		}
-
-		@Override
-		public long getCreationDate() {
-			return 0;
-		}
-
-		@Override
-		public SkinProperty getSkin() {
-			return null;
-		}
-
-		@Override
-		public boolean isForced() {
-			return false;
-		}
-	};
-
-	private long timestamp;
-	private boolean isForced;
-	private Profile profile;
-	private SkinProperty skin;
-
-	private SkinProfile() {
-	}
+	long timestamp;
+	boolean isForced;
+	Profile profile;
+	SkinProperty skin;
 
 	public SkinProfile(Profile profile, SkinProperty skinData, long creationTime, boolean isForced) {
 		this.profile = profile;
@@ -79,28 +47,40 @@ public class SkinProfile implements Cloneable {
 		this.isForced = isForced;
 	}
 
-	public boolean isValid() {
-		return (System.currentTimeMillis() - timestamp) <= (2 * 60 * 60 * 1000) || isForced();
+	public String getName() {
+		return profile.getName();
 	}
 
-	public boolean isForced() {
-		return isForced;
+	public void attemptUpdate(String playername) throws SkinFetchFailedException {
+		if (!shouldUpdate()) {
+			return;
+		}
+		try {
+			SkinProfile newskinprofile = SkinFetchUtils.fetchSkinProfile(playername, profile != null ? getUUID() : null);
+			this.timestamp = System.currentTimeMillis();
+			this.profile = newskinprofile.profile;
+			this.skin = newskinprofile.skin;
+		} catch (SkinFetchFailedException e) {
+			if (e.getReason() == Reason.NO_PREMIUM_PLAYER || e.getReason() == Reason.NO_SKIN_DATA) {
+				this.timestamp = System.currentTimeMillis();
+				return;
+			}
+			throw e;
+		}
 	}
 
-	public long getCreationDate() {
-		return timestamp;
-	}
-
-	public SkinProperty getSkin() {
-		return skin;
-	}
-
-	public UUID getUUID() {
+	private UUID getUUID() {
 		return UUIDUtil.fromDashlessString(profile.getId());
 	}
 
-	public String getName() {
-		return profile.getName();
+	private boolean shouldUpdate() {
+		return (System.currentTimeMillis() - timestamp) >= (2 * 60 * 60 * 1000) && !isForced;
+	}
+
+	public void applySkin(ApplyFunction applyfunction) {
+		if (skin != null) {
+			applyfunction.applySkin(skin);
+		}
 	}
 
 	public SkinProfile cloneAsForced() {
@@ -143,6 +123,12 @@ public class SkinProfile implements Cloneable {
 			object.add("skin", skin);
 			return object;
 		}
+
+	}
+
+	public static interface ApplyFunction {
+
+		public void applySkin(SkinProperty property);
 
 	}
 
