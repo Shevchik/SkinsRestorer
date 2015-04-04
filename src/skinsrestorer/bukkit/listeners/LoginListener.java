@@ -38,9 +38,9 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(name);
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(name);
 		try {
-			skinprofile.attemptUpdate(name);
+			skinprofile.attemptUpdate();
 		} catch (SkinFetchFailedException e) {
 			SkinsRestorer.getInstance().logInfo("Skin fetch failed for player "+name+": "+e.getMessage());
 		}
@@ -50,7 +50,7 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onLoginEvent(PlayerLoginEvent event) {
 		Player player = event.getPlayer();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(player.getName());
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(player.getName());
 		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
 			@Override
 			public void applySkin(SkinProperty property) {

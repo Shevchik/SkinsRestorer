@@ -17,11 +17,14 @@
 
 package skinsrestorer.bungee;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import skinsrestorer.bungee.commands.AdminCommands;
 import skinsrestorer.bungee.commands.PlayerCommands;
 import skinsrestorer.bungee.listeners.LoginListener;
+import skinsrestorer.shared.storage.CooldownStorage;
+import skinsrestorer.shared.storage.LocaleStorage;
 import skinsrestorer.shared.storage.SkinStorage;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -44,12 +47,14 @@ public class SkinsRestorer extends Plugin {
 
 	@Override
 	public void onEnable() {
+		LocaleStorage.init(getDataFolder());
 		instance = this;
 		log = getLogger();
 		storage.loadData();
 		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
 		this.getProxy().getPluginManager().registerCommand(this, new AdminCommands());
 		this.getProxy().getPluginManager().registerCommand(this, new PlayerCommands());
+		this.getProxy().getScheduler().schedule(this, CooldownStorage.cleanupCooldowns, 0, 1, TimeUnit.MINUTES);
 	}
 
 	@Override

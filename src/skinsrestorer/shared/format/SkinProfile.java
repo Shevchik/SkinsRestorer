@@ -18,7 +18,6 @@
 package skinsrestorer.shared.format;
 
 import java.lang.reflect.Type;
-import java.util.UUID;
 
 import skinsrestorer.libs.com.google.gson.JsonDeserializationContext;
 import skinsrestorer.libs.com.google.gson.JsonDeserializer;
@@ -35,10 +34,10 @@ import skinsrestorer.shared.utils.UUIDUtil;
 
 public class SkinProfile implements Cloneable {
 
-	long timestamp;
-	boolean isForced;
-	Profile profile;
-	SkinProperty skin;
+	protected long timestamp;
+	protected boolean isForced;
+	protected Profile profile;
+	protected SkinProperty skin;
 
 	public SkinProfile(Profile profile, SkinProperty skinData, long creationTime, boolean isForced) {
 		this.profile = profile;
@@ -51,12 +50,12 @@ public class SkinProfile implements Cloneable {
 		return profile.getName();
 	}
 
-	public void attemptUpdate(String playername) throws SkinFetchFailedException {
-		if (!shouldUpdate()) {
+	public void attemptUpdate() throws SkinFetchFailedException {
+		if (isForced || (System.currentTimeMillis() - timestamp) <= (2 * 60 * 60 * 1000)) {
 			return;
 		}
 		try {
-			SkinProfile newskinprofile = SkinFetchUtils.fetchSkinProfile(playername, profile != null ? getUUID() : null);
+			SkinProfile newskinprofile = SkinFetchUtils.fetchSkinProfile(profile.getName(), UUIDUtil.fromDashlessString(profile.getId()));
 			this.timestamp = System.currentTimeMillis();
 			this.profile = newskinprofile.profile;
 			this.skin = newskinprofile.skin;
@@ -69,14 +68,6 @@ public class SkinProfile implements Cloneable {
 		}
 	}
 
-	private UUID getUUID() {
-		return UUIDUtil.fromDashlessString(profile.getId());
-	}
-
-	private boolean shouldUpdate() {
-		return (System.currentTimeMillis() - timestamp) >= (2 * 60 * 60 * 1000) && !isForced;
-	}
-
 	public void applySkin(ApplyFunction applyfunction) {
 		if (skin != null) {
 			applyfunction.applySkin(skin);
@@ -84,7 +75,9 @@ public class SkinProfile implements Cloneable {
 	}
 
 	public SkinProfile cloneAsForced() {
-		return new SkinProfile(profile.clone(), skin, timestamp, true);
+		SkinProfile cloned = this.clone();
+		cloned.isForced = true;
+		return cloned;
 	}
 
 	@Override
@@ -92,6 +85,12 @@ public class SkinProfile implements Cloneable {
 		return new SkinProfile(profile.clone(), skin, timestamp, isForced);
 	}
 
+
+	private static final long MONTH = 30L * 24L * 60L * 60L * 1000L;
+
+	public boolean shouldSerialize() {
+		return profile.getId() != null && skin != null && (System.currentTimeMillis() - timestamp < MONTH);
+	}
 
 	public static class GsonTypeAdapter implements JsonSerializer<SkinProfile>, JsonDeserializer<SkinProfile> {
 

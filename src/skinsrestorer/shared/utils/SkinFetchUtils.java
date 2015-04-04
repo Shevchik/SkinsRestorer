@@ -22,6 +22,7 @@ import java.util.UUID;
 import skinsrestorer.libs.org.json.simple.parser.ParseException;
 import skinsrestorer.shared.format.Profile;
 import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.storage.LocaleStorage;
 
 public class SkinFetchUtils {
 
@@ -68,11 +69,11 @@ public class SkinFetchUtils {
 		}
 
 		public static enum Reason {
-			NO_PREMIUM_PLAYER("Can't find a valid premium player with that name"),
-			NO_SKIN_DATA("No skin data found for player with that name"),
-			SKIN_RECODE_FAILED("Can't decode skin data"),
-			RATE_LIMITED("Rate limited"),
-			GENERIC_ERROR("An error has occured");
+			NO_PREMIUM_PLAYER(LocaleStorage.getInstance().SKIN_FETCH_FAILED_NO_PREMIUM_PLAYER),
+			NO_SKIN_DATA(LocaleStorage.getInstance().SKIN_FETCH_FAILED_NO_SKIN_DATA),
+			SKIN_RECODE_FAILED(LocaleStorage.getInstance().SKIN_FETCH_FAILED_PARSE_FAILED),
+			RATE_LIMITED(LocaleStorage.getInstance().SKIN_FETCH_FAILED_RATE_LIMITED),
+			GENERIC_ERROR(LocaleStorage.getInstance().SKIN_FETCH_FAILED_ERROR);
 
 			private String exceptionCause;
 

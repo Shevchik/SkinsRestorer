@@ -18,11 +18,10 @@
 package skinsrestorer.shared.storage;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,8 +30,9 @@ import skinsrestorer.libs.com.google.gson.Gson;
 import skinsrestorer.libs.com.google.gson.GsonBuilder;
 import skinsrestorer.libs.com.google.gson.JsonIOException;
 import skinsrestorer.libs.com.google.gson.reflect.TypeToken;
-import skinsrestorer.shared.format.LocalAccess;
+import skinsrestorer.shared.format.Profile;
 import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.utils.IOUils;
 
 public class SkinStorage {
 
@@ -52,28 +52,20 @@ public class SkinStorage {
 		skins.remove(name.toLowerCase());
 	}
 
-	public void addSkinData(String name, SkinProfile profile) {
-		skins.put(name.toLowerCase(), profile);
+	public void setSkinData(String name, SkinProfile profile) {
+		skins.put(name.toLowerCase(), profile.cloneAsForced());
 	}
 
-	public SkinProfile getSkinData(String name) {
-		SkinProfile cachedprofile = skins.get(name.toLowerCase());
-		if (cachedprofile != null) {
-			return cachedprofile;
-		}
-		SkinProfile emptyprofile = new SkinProfile(null, null, 0, false);
-		skins.put(name.toLowerCase(), emptyprofile);
-		return emptyprofile;
-	}
-
-	public Map<String, SkinProfile> getSkinData() {
-		return Collections.unmodifiableMap(skins);
+	public SkinProfile getOrCreateSkinData(String name) {
+		SkinProfile emptyprofile = new SkinProfile(new Profile(null, name), null, 0, false);
+		SkinProfile cachedprofile = skins.putIfAbsent(name.toLowerCase(), emptyprofile);
+		return cachedprofile != null ? cachedprofile : emptyprofile;
 	}
 
 
 	public void loadData() {
-		try {
-			Map<String, SkinProfile> gsondata = gson.fromJson(new FileReader(new File(pluginfolder, cachefile)), type);
+		try (InputStreamReader reader = IOUils.createReader(new File(pluginfolder, cachefile))) {
+			Map<String, SkinProfile> gsondata = gson.fromJson(reader, type);
 			if (gsondata != null) {
 				skins.putAll(gsondata);
 			}
@@ -82,15 +74,17 @@ public class SkinStorage {
 	}
 
 	public void saveData() {
-		try (FileWriter writer = new FileWriter(new File(pluginfolder, cachefile))) {
+		pluginfolder.mkdirs();
+		try (OutputStreamWriter writer = IOUils.createWriter(new File(pluginfolder, cachefile))) {
 			ConcurrentHashMap<String, SkinProfile> serialize = new ConcurrentHashMap<String, SkinProfile>();
 			for (Entry<String, SkinProfile> entry : skins.entrySet()) {
-				if (LocalAccess.shouldSerialize(entry.getValue())) {
+				if (entry.getValue().shouldSerialize()) {
 					serialize.put(entry.getKey(), entry.getValue());
 				}
 			}
 			writer.write(gson.toJson(serialize, type));
 		} catch (JsonIOException | IOException e) {
+			e.printStackTrace();
 		}
 	}
 

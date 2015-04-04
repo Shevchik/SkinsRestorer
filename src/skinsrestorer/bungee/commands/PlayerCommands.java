@@ -17,15 +17,18 @@
 
 package skinsrestorer.bungee.commands;
 
+import java.util.concurrent.TimeUnit;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
-
 import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.storage.CooldownStorage;
+import skinsrestorer.shared.storage.LocaleStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
@@ -44,11 +47,18 @@ public class PlayerCommands extends Command {
 		final ProxiedPlayer player = (ProxiedPlayer) sender;
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
 			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(player.getName());
-			TextComponent component = new TextComponent("Your skin data cleared");
+			TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
 			component.setColor(ChatColor.BLUE);
 			player.sendMessage(component);
 		} else
 		if ((args.length == 2) && args[0].equalsIgnoreCase("set")) {
+			if (CooldownStorage.getInstance().isAtCooldown(player.getUniqueId())) {
+				TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_COOLDOWN);
+				component.setColor(ChatColor.RED);
+				player.sendMessage(component);
+				return;
+			}
+			CooldownStorage.getInstance().setCooldown(player.getUniqueId(), 10, TimeUnit.MINUTES);
 			ProxyServer.getInstance().getScheduler().runAsync(
 				SkinsRestorer.getInstance(),
 				new Runnable() {
@@ -57,12 +67,12 @@ public class PlayerCommands extends Command {
 						String from = args[1];
 						try {
 							SkinProfile skinprofile = SkinFetchUtils.fetchSkinProfile(from, null);
-							SkinsRestorer.getInstance().getSkinStorage().addSkinData(player.getName(), skinprofile);
-							TextComponent component = new TextComponent("Your skin has been updated, relog to see changes");
+							SkinsRestorer.getInstance().getSkinStorage().setSkinData(player.getName(), skinprofile);
+							TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SUCCESS);
 							component.setColor(ChatColor.BLUE);
 							player.sendMessage(component);
 						} catch (SkinFetchFailedException e) {
-							TextComponent component = new TextComponent("Skin fetch failed: "+e.getMessage());
+							TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_FAILED+e.getMessage());
 							component.setColor(ChatColor.RED);
 							player.sendMessage(component);
 						}

@@ -17,8 +17,9 @@
 
 package skinsrestorer.bukkit;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.bukkit.event.Listener;
@@ -27,11 +28,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import skinsrestorer.bukkit.commands.AdminCommands;
 import skinsrestorer.bukkit.commands.PlayerCommands;
 import skinsrestorer.bukkit.listeners.LoginListener;
+import skinsrestorer.shared.storage.CooldownStorage;
+import skinsrestorer.shared.storage.LocaleStorage;
 import skinsrestorer.shared.storage.SkinStorage;
 
 public class SkinsRestorer extends JavaPlugin implements Listener {
 
-	public static final ExecutorService executor = Executors.newSingleThreadExecutor();
+	public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
 	private static SkinsRestorer instance;
 	public static SkinsRestorer getInstance() {
@@ -50,18 +53,21 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		LocaleStorage.init(getDataFolder());
 		instance = this;
 		log = getLogger();
 		storage.loadData();
 		getCommand("skinsrestorer").setExecutor(new AdminCommands());
 		getCommand("skin").setExecutor(new PlayerCommands());
 		getServer().getPluginManager().registerEvents(new LoginListener(), this);
+		executor.scheduleWithFixedDelay(CooldownStorage.cleanupCooldowns, 0, 1, TimeUnit.MINUTES);
 	}
 
 	@Override
 	public void onDisable() {
 		storage.saveData();
 		instance = null;
+		executor.shutdown();
 	}
 
 }

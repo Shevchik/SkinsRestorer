@@ -53,13 +53,13 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onPreLogin(final LoginEvent event) {
 		final String name = event.getConnection().getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(name);
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(name);
 		event.registerIntent(SkinsRestorer.getInstance());
 		ProxyServer.getInstance().getScheduler().runAsync(SkinsRestorer.getInstance(), new Runnable() {
 			@Override
 			public void run() {
 				try {
-					skinprofile.attemptUpdate(name);
+					skinprofile.attemptUpdate();
 				} catch (SkinFetchFailedException e) {
 					SkinsRestorer.getInstance().logInfo("Skin fetch failed for player " + name + ": " + e.getMessage());
 				} finally {
@@ -73,7 +73,7 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onPostLogin(PostLoginEvent event) {
 		String name = event.getPlayer().getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getSkinData(name);
+		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(name);
 		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
 			@Override
 			public void applySkin(SkinProperty property) {

@@ -23,8 +23,8 @@ public class Profile implements Cloneable {
 	private String name;
 
 	public Profile(String id, String name) {
-		this.id = id;
-		this.name = name;
+		this.id = id != null ? id.replace("-", "") : null;
+		this.name = name.toLowerCase();
 	}
 
 	public String getId() {
@@ -37,7 +37,7 @@ public class Profile implements Cloneable {
 
 	@Override
 	public Profile clone() {
-		return new Profile(new String(id.toCharArray()), new String(name.toCharArray()));
+		return new Profile(id, name);
 	}
 
 }

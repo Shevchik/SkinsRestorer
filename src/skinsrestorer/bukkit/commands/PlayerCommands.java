@@ -17,6 +17,8 @@
 
 package skinsrestorer.bukkit.commands;
 
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,6 +27,8 @@ import org.bukkit.entity.Player;
 
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
+import skinsrestorer.shared.storage.CooldownStorage;
+import skinsrestorer.shared.storage.LocaleStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
@@ -42,10 +46,15 @@ public class PlayerCommands implements CommandExecutor {
 		final Player player = (Player) sender;
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
 			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(player.getName());
-			player.sendMessage(ChatColor.BLUE+"Your skin data cleared");
+			player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
 			return true;
 		} else
 		if ((args.length == 2) && args[0].equalsIgnoreCase("set")) {
+			if (CooldownStorage.getInstance().isAtCooldown(player.getUniqueId())) {
+				player.sendMessage(ChatColor.RED+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_COOLDOWN);
+				return true;
+			}
+			CooldownStorage.getInstance().setCooldown(player.getUniqueId(), 10, TimeUnit.MINUTES);
 			SkinsRestorer.executor.execute(
 				new Runnable() {
 					@Override
@@ -53,10 +62,10 @@ public class PlayerCommands implements CommandExecutor {
 						String from = args[1];
 						try {
 							SkinProfile skinprofile = SkinFetchUtils.fetchSkinProfile(from, null);
-							SkinsRestorer.getInstance().getSkinStorage().addSkinData(player.getName(), skinprofile);
-							player.sendMessage(ChatColor.BLUE+"Your skin has been updated, relog to see changes");
+							SkinsRestorer.getInstance().getSkinStorage().setSkinData(player.getName(), skinprofile);
+							player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SUCCESS);
 						} catch (SkinFetchFailedException e) {
-							player.sendMessage(ChatColor.RED+"Skin fetch failed: "+e.getMessage());
+							player.sendMessage(ChatColor.RED+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_FAILED+e.getMessage());
 						}
 					}
 				}
