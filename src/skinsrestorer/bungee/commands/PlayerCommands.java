@@ -75,6 +75,7 @@ public class PlayerCommands extends Command {
 							TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_FAILED+e.getMessage());
 							component.setColor(ChatColor.RED);
 							player.sendMessage(component);
+							CooldownStorage.getInstance().resetCooldown(player.getUniqueId());
 						}
 					}
 				}

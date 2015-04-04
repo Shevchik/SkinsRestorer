@@ -66,6 +66,7 @@ public class PlayerCommands implements CommandExecutor {
 							player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SUCCESS);
 						} catch (SkinFetchFailedException e) {
 							player.sendMessage(ChatColor.RED+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_FAILED+e.getMessage());
+							CooldownStorage.getInstance().resetCooldown(player.getUniqueId());
 						}
 					}
 				}

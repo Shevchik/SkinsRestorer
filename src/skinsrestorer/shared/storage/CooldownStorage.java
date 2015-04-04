@@ -44,6 +44,10 @@ public class CooldownStorage {
 		return cooldown.getOrDefault(playeruuid, Long.MIN_VALUE) > System.currentTimeMillis();
 	}
 
+	public void resetCooldown(UUID playeruuid) {
+		cooldown.remove(playeruuid);
+	}
+
 	public static final Runnable cleanupCooldowns = new Runnable() {
 		@Override
 		public void run() {
