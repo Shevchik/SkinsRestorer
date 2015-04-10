@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import skinsrestorer.libs.com.google.gson.Gson;
@@ -57,9 +56,7 @@ public class SkinStorage {
 	}
 
 	public SkinProfile getOrCreateSkinData(String name) {
-		SkinProfile emptyprofile = new SkinProfile(new Profile(null, name), null, 0, false);
-		SkinProfile cachedprofile = skins.putIfAbsent(name.toLowerCase(), emptyprofile);
-		return cachedprofile != null ? cachedprofile : emptyprofile;
+		return skins.computeIfAbsent(name.toLowerCase(), (key) -> new SkinProfile(new Profile(null, name), null, 0, false));
 	}
 
 
@@ -77,14 +74,13 @@ public class SkinStorage {
 		pluginfolder.mkdirs();
 		try (OutputStreamWriter writer = IOUils.createWriter(new File(pluginfolder, cachefile))) {
 			ConcurrentHashMap<String, SkinProfile> serialize = new ConcurrentHashMap<String, SkinProfile>();
-			for (Entry<String, SkinProfile> entry : skins.entrySet()) {
-				if (entry.getValue().shouldSerialize()) {
-					serialize.put(entry.getKey(), entry.getValue());
+			serialize.forEach((name, entry) -> {
+				if (entry.shouldSerialize()) {
+					serialize.put(name, entry);
 				}
-			}
+			});
 			writer.write(gson.toJson(serialize, type));
 		} catch (JsonIOException | IOException e) {
-			e.printStackTrace();
 		}
 	}
 
