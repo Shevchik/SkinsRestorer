@@ -40,7 +40,7 @@ public class SkinsRestorer extends Plugin {
 		log.info(message);
 	}
 
-	private SkinStorage storage = new SkinStorage(getDataFolder());
+	private SkinStorage storage;
 	public SkinStorage getSkinStorage() {
 		return storage;
 	}
@@ -50,6 +50,7 @@ public class SkinsRestorer extends Plugin {
 		LocaleStorage.init(getDataFolder());
 		instance = this;
 		log = getLogger();
+		storage = new SkinStorage(getDataFolder());
 		storage.loadData();
 		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
 		this.getProxy().getPluginManager().registerCommand(this, new AdminCommands());
