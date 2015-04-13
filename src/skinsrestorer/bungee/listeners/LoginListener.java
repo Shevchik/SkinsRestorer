@@ -17,8 +17,6 @@
 
 package skinsrestorer.bungee.listeners;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
 import skinsrestorer.bungee.SkinsRestorer;
@@ -34,15 +32,16 @@ import net.md_5.bungee.connection.InitialHandler;
 import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.connection.LoginResult.Property;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class LoginListener implements Listener {
 
-	private static final MethodHandle profileFieldSetter = getProfileField();
-	private static MethodHandle getProfileField() {
+	private static final Field profileField = getProfileField();
+	private static Field getProfileField() {
 		try {
 			Field profileField = InitialHandler.class.getDeclaredField("loginProfile"); 
 			profileField.setAccessible(true);
-			return MethodHandles.lookup().unreflectSetter(profileField);
+			return profileField;
 		} catch (Throwable t) {
 			System.err.println("Failed to get method handle for initial handel loginProfile field");
 			t.printStackTrace();
@@ -51,8 +50,11 @@ public class LoginListener implements Listener {
 	}
 
 	//load skin data on login
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPreLogin(final LoginEvent event) {
+		if (event.isCancelled()) {
+			return;
+		}
 		final String name = event.getConnection().getName();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		event.registerIntent(SkinsRestorer.getInstance());
@@ -71,7 +73,7 @@ public class LoginListener implements Listener {
 	}
 
 	//fix profile on login
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPostLogin(PostLoginEvent event) {
 		String name = event.getPlayer().getName();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
@@ -79,11 +81,27 @@ public class LoginListener implements Listener {
 			@Override
 			public void applySkin(SkinProperty property) {
 				try {
+					Property textures = new Property(property.getName(), property.getValue(), property.getSignature());
 					InitialHandler handler = (InitialHandler) event.getPlayer().getPendingConnection();
-					Property[] properties = new Property[1];
-					properties[0] = new Property(property.getName(), property.getValue(), property.getSignature());
-					LoginResult profile = new LoginResult(event.getPlayer().getUniqueId().toString(), properties);
-					profileFieldSetter.invokeExact(handler, profile);
+					LoginResult profile = (LoginResult) profileField.get(handler);
+					if (profile == null) {
+						profile = new LoginResult(event.getPlayer().getUniqueId().toString(), new Property[] { textures });
+					} else {
+						Property[] present = profile.getProperties();
+						boolean alreadyHasSkin = false;
+						for (Property prop : present) {
+							if (prop.getName().equals(textures.getName())) {
+								alreadyHasSkin = true;
+							}
+						}
+						if (!alreadyHasSkin) {
+							Property[] newprops = new Property[present.length + 1];
+							System.arraycopy(present, 0, newprops, 0, present.length);
+							newprops[present.length] = textures;
+							profile.setProperties(newprops);
+						}
+					}
+					profileField.set(handler, profile);
 				} catch (Throwable t) {
 					t.printStackTrace();
 				}

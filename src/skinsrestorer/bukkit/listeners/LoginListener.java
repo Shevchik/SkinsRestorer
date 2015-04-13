@@ -19,6 +19,7 @@ package skinsrestorer.bukkit.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -36,8 +37,11 @@ import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 public class LoginListener implements Listener {
 
 	//load skin data on async prelogin event
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
+		if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+			return;
+		}
 		String name = event.getName();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		try {
@@ -48,8 +52,11 @@ public class LoginListener implements Listener {
 	}
 
 	//fix skin on player login
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onLoginEvent(PlayerLoginEvent event) {
+		if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
+			return;
+		}
 		Player player = event.getPlayer();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(player.getName());
 		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
