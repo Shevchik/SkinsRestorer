@@ -46,8 +46,10 @@ public class PlayerCommands implements CommandExecutor {
 		}
 		final Player player = (Player) sender;
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
-			SkinStorage.getInstance().removeSkinData(player.getName());
-			player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
+			if (SkinStorage.getInstance().isSkinDataForced(player.getName())) {
+				SkinStorage.getInstance().removeSkinData(player.getName());
+				player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
+			}
 			return true;
 		} else
 		if ((args.length == 2) && args[0].equalsIgnoreCase("set")) {

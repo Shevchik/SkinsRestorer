@@ -50,6 +50,10 @@ public class SkinProfile implements Cloneable {
 		return profile.getName();
 	}
 
+	public boolean isForced() {
+		return isForced;
+	}
+
 	public void attemptUpdate() throws SkinFetchFailedException {
 		if (isForced) {
 			timestamp = System.currentTimeMillis();

@@ -47,10 +47,12 @@ public class PlayerCommands extends Command {
 		}
 		final ProxiedPlayer player = (ProxiedPlayer) sender;
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
-			SkinStorage.getInstance().removeSkinData(player.getName());
-			TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
-			component.setColor(ChatColor.BLUE);
-			player.sendMessage(component);
+			if (SkinStorage.getInstance().isSkinDataForced(player.getName())) {
+				SkinStorage.getInstance().removeSkinData(player.getName());
+				TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
+				component.setColor(ChatColor.BLUE);
+				player.sendMessage(component);
+			}
 		} else
 		if ((args.length == 2) && args[0].equalsIgnoreCase("set")) {
 			if (CooldownStorage.getInstance().isAtCooldown(player.getUniqueId())) {

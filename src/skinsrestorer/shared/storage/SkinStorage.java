@@ -54,6 +54,14 @@ public class SkinStorage {
 
 	private ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();
 
+	public boolean isSkinDataForced(String name) {
+		SkinProfile profile = skins.get(name.toLowerCase());
+		if (profile != null && profile.isForced()) {
+			return true;
+		}
+		return false;
+	}
+
 	public void removeSkinData(String name) {
 		skins.remove(name.toLowerCase());
 	}
