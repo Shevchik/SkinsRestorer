@@ -35,14 +35,21 @@ import skinsrestorer.shared.utils.IOUils;
 
 public class SkinStorage {
 
+	private static final SkinStorage instance = new SkinStorage();
+
+	public static SkinStorage getInstance() {
+		return instance;
+	}
+
 	private static final String cachefile = "cache.json";
 	private static final Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(SkinProfile.class, new SkinProfile.GsonTypeAdapter()).setPrettyPrinting().create();
 	private static final Type type = new TypeToken<ConcurrentHashMap<String, SkinProfile>>(){}.getType();
 
-	private File pluginfolder;
+	private static File pluginfolder;
 
-	public SkinStorage(File pluginfolder) {
-		this.pluginfolder = pluginfolder;
+	public static void init(File pluginfolder) {
+		SkinStorage.pluginfolder = pluginfolder;
+		instance.loadData();
 	}
 
 	private ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();

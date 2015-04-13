@@ -30,6 +30,7 @@ import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
+import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
 public class LoginListener implements Listener {
@@ -38,7 +39,7 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
 		String name = event.getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(name);
+		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		try {
 			skinprofile.attemptUpdate();
 		} catch (SkinFetchFailedException e) {
@@ -50,7 +51,7 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onLoginEvent(PlayerLoginEvent event) {
 		Player player = event.getPlayer();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(player.getName());
+		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(player.getName());
 		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
 			@Override
 			public void applySkin(SkinProperty property) {

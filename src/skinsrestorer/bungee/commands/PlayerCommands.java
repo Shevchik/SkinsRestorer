@@ -29,6 +29,7 @@ import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.storage.CooldownStorage;
 import skinsrestorer.shared.storage.LocaleStorage;
+import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
@@ -46,7 +47,7 @@ public class PlayerCommands extends Command {
 		}
 		final ProxiedPlayer player = (ProxiedPlayer) sender;
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
-			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(player.getName());
+			SkinStorage.getInstance().removeSkinData(player.getName());
 			TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
 			component.setColor(ChatColor.BLUE);
 			player.sendMessage(component);
@@ -67,7 +68,7 @@ public class PlayerCommands extends Command {
 						String from = args[1];
 						try {
 							SkinProfile skinprofile = SkinFetchUtils.fetchSkinProfile(from, null);
-							SkinsRestorer.getInstance().getSkinStorage().setSkinData(player.getName(), skinprofile);
+							SkinStorage.getInstance().setSkinData(player.getName(), skinprofile);
 							TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SUCCESS);
 							component.setColor(ChatColor.BLUE);
 							player.sendMessage(component);

@@ -40,18 +40,12 @@ public class SkinsRestorer extends Plugin {
 		log.info(message);
 	}
 
-	private SkinStorage storage;
-	public SkinStorage getSkinStorage() {
-		return storage;
-	}
-
 	@Override
 	public void onEnable() {
-		LocaleStorage.init(getDataFolder());
 		instance = this;
 		log = getLogger();
-		storage = new SkinStorage(getDataFolder());
-		storage.loadData();
+		LocaleStorage.init(getDataFolder());
+		SkinStorage.init(getDataFolder());
 		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
 		this.getProxy().getPluginManager().registerCommand(this, new AdminCommands());
 		this.getProxy().getPluginManager().registerCommand(this, new PlayerCommands());
@@ -60,7 +54,7 @@ public class SkinsRestorer extends Plugin {
 
 	@Override
 	public void onDisable() {
-		storage.saveData();
+		SkinStorage.getInstance().saveData();
 		instance = null;
 	}
 

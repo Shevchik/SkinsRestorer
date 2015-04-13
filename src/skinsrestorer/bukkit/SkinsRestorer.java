@@ -46,17 +46,12 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		log.info(message);
 	}
 
-	private SkinStorage storage = new SkinStorage(getDataFolder());
-	public SkinStorage getSkinStorage() {
-		return storage;
-	}
-
 	@Override
 	public void onEnable() {
-		LocaleStorage.init(getDataFolder());
 		instance = this;
 		log = getLogger();
-		storage.loadData();
+		LocaleStorage.init(getDataFolder());
+		SkinStorage.init(getDataFolder());
 		getCommand("skinsrestorer").setExecutor(new AdminCommands());
 		getCommand("skin").setExecutor(new PlayerCommands());
 		getServer().getPluginManager().registerEvents(new LoginListener(), this);
@@ -65,9 +60,9 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 
 	@Override
 	public void onDisable() {
-		storage.saveData();
-		instance = null;
+		SkinStorage.getInstance().saveData();
 		executor.shutdown();
+		instance = null;
 	}
 
 }

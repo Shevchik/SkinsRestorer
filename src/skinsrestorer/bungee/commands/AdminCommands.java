@@ -18,8 +18,8 @@
 package skinsrestorer.bungee.commands;
 
 import skinsrestorer.bungee.SkinsRestorer;
+import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
-
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -35,7 +35,7 @@ public class AdminCommands extends Command {
 	@Override
 	public void execute(final CommandSender sender, String[] args) {
 		if ((args.length == 2) && args[0].equalsIgnoreCase("drop")) {
-			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(args[1]);
+			SkinStorage.getInstance().removeSkinData(args[1]);
 			TextComponent component = new TextComponent("Skin data for player "+args[1]+" dropped");
 			component.setColor(ChatColor.BLUE);
 			sender.sendMessage(component);
@@ -48,7 +48,7 @@ public class AdminCommands extends Command {
 					@Override
 					public void run() {
 						try {
-							SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(name).attemptUpdate();
+							SkinStorage.getInstance().getOrCreateSkinData(name).attemptUpdate();
 							TextComponent component = new TextComponent("Skin data updated");
 							component.setColor(ChatColor.BLUE);
 							sender.sendMessage(component);

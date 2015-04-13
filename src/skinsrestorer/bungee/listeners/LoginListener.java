@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
+import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -53,7 +54,7 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onPreLogin(final LoginEvent event) {
 		final String name = event.getConnection().getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(name);
+		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		event.registerIntent(SkinsRestorer.getInstance());
 		ProxyServer.getInstance().getScheduler().runAsync(SkinsRestorer.getInstance(), new Runnable() {
 			@Override
@@ -73,7 +74,7 @@ public class LoginListener implements Listener {
 	@EventHandler
 	public void onPostLogin(PostLoginEvent event) {
 		String name = event.getPlayer().getName();
-		SkinProfile skinprofile = SkinsRestorer.getInstance().getSkinStorage().getOrCreateSkinData(name);
+		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
 			@Override
 			public void applySkin(SkinProperty property) {
