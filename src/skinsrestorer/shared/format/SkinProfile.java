@@ -51,6 +51,9 @@ public class SkinProfile implements Cloneable {
 	}
 
 	public void attemptUpdate() throws SkinFetchFailedException {
+		if (isForced) {
+			timestamp = System.currentTimeMillis();
+		}
 		if (isForced || (System.currentTimeMillis() - timestamp) <= (2 * 60 * 60 * 1000)) {
 			return;
 		}
