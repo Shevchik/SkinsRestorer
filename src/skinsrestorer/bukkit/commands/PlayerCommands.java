@@ -29,7 +29,6 @@ import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.storage.CooldownStorage;
 import skinsrestorer.shared.storage.LocaleStorage;
-import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
@@ -45,11 +44,19 @@ public class PlayerCommands implements CommandExecutor {
 			sender.sendMessage("This commands are only for players");
 		}
 		final Player player = (Player) sender;
+		if (args.length == 0){
+			player.sendMessage(ChatColor.BLUE+"Use /skin help for help.");
+			return true;
+		}else
+		if ((args.length == 1) && args[0].equalsIgnoreCase("help")){
+			player.sendMessage(ChatColor.BLUE+"]=========[ SkinsRestorer Help ]=========[");
+			player.sendMessage(ChatColor.BLUE+"/skin set <PlayerName> - Sets your skin.");
+			player.sendMessage(ChatColor.BLUE+"/skin clear - Clears your skin data.");
+			return true;
+		}else
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
-			if (SkinStorage.getInstance().isSkinDataForced(player.getName())) {
-				SkinStorage.getInstance().removeSkinData(player.getName());
-				player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
-			}
+			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(player.getName());
+			player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
 			return true;
 		} else
 		if ((args.length == 2) && args[0].equalsIgnoreCase("set")) {
@@ -65,7 +72,7 @@ public class PlayerCommands implements CommandExecutor {
 						String from = args[1];
 						try {
 							SkinProfile skinprofile = SkinFetchUtils.fetchSkinProfile(from, null);
-							SkinStorage.getInstance().setSkinData(player.getName(), skinprofile);
+							SkinsRestorer.getInstance().getSkinStorage().setSkinData(player.getName(), skinprofile);
 							player.sendMessage(ChatColor.BLUE+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SUCCESS);
 						} catch (SkinFetchFailedException e) {
 							player.sendMessage(ChatColor.RED+LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_FAILED+e.getMessage());
