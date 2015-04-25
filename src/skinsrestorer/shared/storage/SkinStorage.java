@@ -88,13 +88,11 @@ public class SkinStorage {
 	public void saveData() {
 		pluginfolder.mkdirs();
 		try (OutputStreamWriter writer = IOUils.createWriter(new File(pluginfolder, cachefile))) {
-			ConcurrentHashMap<String, SkinProfile> serialize = new ConcurrentHashMap<String, SkinProfile>();
-			serialize.forEach((name, entry) -> {
-				if (entry.shouldSerialize()) {
-					serialize.put(name, entry);
-				}
-			});
-			writer.write(gson.toJson(serialize, type));
+			ConcurrentHashMap<String, SkinProfile> toSerialize = new ConcurrentHashMap<String, SkinProfile>();
+			skins.entrySet().stream()
+			.filter(entry -> entry.getValue().shouldSerialize())
+			.forEach(entry -> toSerialize.put(entry.getKey(), entry.getValue()));
+			writer.write(gson.toJson(toSerialize, type));
 		} catch (JsonIOException | IOException e) {
 		}
 	}
