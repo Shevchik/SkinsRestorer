@@ -43,6 +43,7 @@ public class PlayerCommands implements CommandExecutor {
 		}
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("This commands are only for players");
+			return true;
 		}
 		final Player player = (Player) sender;
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {

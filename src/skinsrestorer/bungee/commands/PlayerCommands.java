@@ -44,6 +44,7 @@ public class PlayerCommands extends Command {
 		if (!(sender instanceof ProxiedPlayer)) {
 			TextComponent component = new TextComponent("This commands are only for players");
 			sender.sendMessage(component);
+			return;
 		}
 		final ProxiedPlayer player = (ProxiedPlayer) sender;
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
