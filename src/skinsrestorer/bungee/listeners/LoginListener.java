@@ -56,7 +56,7 @@ public class LoginListener implements Listener {
 			return;
 		}
 		final String name = event.getConnection().getName();
-		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
+		final SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		event.registerIntent(SkinsRestorer.getInstance());
 		ProxyServer.getInstance().getScheduler().runAsync(SkinsRestorer.getInstance(), new Runnable() {
 			@Override
@@ -74,7 +74,7 @@ public class LoginListener implements Listener {
 
 	//fix profile on login
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPostLogin(PostLoginEvent event) {
+	public void onPostLogin(final PostLoginEvent event) {
 		String name = event.getPlayer().getName();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		skinprofile.applySkin(new SkinProfile.ApplyFunction() {

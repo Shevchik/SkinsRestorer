@@ -57,7 +57,7 @@ public class LoginListener implements Listener {
 		if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) {
 			return;
 		}
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(player.getName());
 		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
 			@Override

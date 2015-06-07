@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import skinsrestorer.libs.com.google.gson.Gson;
@@ -45,14 +46,14 @@ public class SkinStorage {
 	private static final Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(SkinProfile.class, new SkinProfile.GsonTypeAdapter()).setPrettyPrinting().create();
 	private static final Type type = new TypeToken<ConcurrentHashMap<String, SkinProfile>>(){}.getType();
 
-	private static File pluginfolder;
+	protected static File pluginfolder;
 
 	public static void init(File pluginfolder) {
 		SkinStorage.pluginfolder = pluginfolder;
 		instance.loadData();
 	}
 
-	private ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();
+	private final ConcurrentHashMap<String, SkinProfile> skins = new ConcurrentHashMap<String, SkinProfile>();
 
 	public boolean isSkinDataForced(String name) {
 		SkinProfile profile = skins.get(name.toLowerCase());
@@ -71,7 +72,9 @@ public class SkinStorage {
 	}
 
 	public SkinProfile getOrCreateSkinData(String name) {
-		return skins.computeIfAbsent(name.toLowerCase(), (key) -> new SkinProfile(new Profile(null, name), null, 0, false));
+		SkinProfile emptyprofile = new SkinProfile(new Profile(null, name), null, 0, false);
+		SkinProfile profile = skins.putIfAbsent(name, emptyprofile);
+		return profile != null ? profile : emptyprofile;
 	}
 
 
@@ -89,10 +92,11 @@ public class SkinStorage {
 		pluginfolder.mkdirs();
 		try (OutputStreamWriter writer = IOUils.createWriter(new File(pluginfolder, cachefile))) {
 			ConcurrentHashMap<String, SkinProfile> toSerialize = new ConcurrentHashMap<String, SkinProfile>();
-			skins.entrySet().stream()
-			.filter(entry -> entry.getValue().shouldSerialize())
-			.forEach(entry -> toSerialize.put(entry.getKey(), entry.getValue()));
-			writer.write(gson.toJson(toSerialize, type));
+			for (Entry<String, SkinProfile> entry : skins.entrySet()) {
+				if (entry.getValue().shouldSerialize()) {
+					toSerialize.put(entry.getKey(), entry.getValue());
+				}
+			}
 		} catch (JsonIOException | IOException e) {
 		}
 	}
