@@ -73,7 +73,7 @@ public class SkinStorage {
 
 	public SkinProfile getOrCreateSkinData(String name) {
 		SkinProfile emptyprofile = new SkinProfile(new Profile(null, name), null, 0, false);
-		SkinProfile profile = skins.putIfAbsent(name, emptyprofile);
+		SkinProfile profile = skins.putIfAbsent(name.toLowerCase(), emptyprofile);
 		return profile != null ? profile : emptyprofile;
 	}
 
