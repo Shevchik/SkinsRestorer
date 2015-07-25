@@ -97,6 +97,7 @@ public class SkinStorage {
 					toSerialize.put(entry.getKey(), entry.getValue());
 				}
 			}
+			gson.toJson(toSerialize, type, writer);
 		} catch (JsonIOException | IOException e) {
 		}
 	}
