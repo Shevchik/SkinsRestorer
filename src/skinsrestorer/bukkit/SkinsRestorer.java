@@ -23,11 +23,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import skinsrestorer.bukkit.commands.AdminCommands;
 import skinsrestorer.bukkit.commands.PlayerCommands;
-import skinsrestorer.bukkit.listeners.LoginListener;
+import skinsrestorer.bukkit.listeners.DefaultLoginListener;
+import skinsrestorer.bukkit.listeners.ProtocolSupportListener;
 import skinsrestorer.shared.storage.CooldownStorage;
 import skinsrestorer.shared.storage.LocaleStorage;
 import skinsrestorer.shared.storage.SkinStorage;
@@ -54,7 +56,14 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		SkinStorage.init(getDataFolder());
 		getCommand("skinsrestorer").setExecutor(new AdminCommands());
 		getCommand("skin").setExecutor(new PlayerCommands());
-		getServer().getPluginManager().registerEvents(new LoginListener(), this);
+		PluginManager pm = getServer().getPluginManager();
+		if (pm.isPluginEnabled("ProtocolSupport")) {
+			pm.registerEvents(new ProtocolSupportListener(), this);
+		} else if (pm.isPluginEnabled("ProtocolLib")) {
+			pm.registerEvents(new DefaultLoginListener(), this);
+		} else {
+			throw new RuntimeException("You need either ProtocolSupport or ProtocolLib for this plugin to function");
+		}
 		executor.scheduleWithFixedDelay(CooldownStorage.cleanupCooldowns, 0, 1, TimeUnit.MINUTES);
 	}
 

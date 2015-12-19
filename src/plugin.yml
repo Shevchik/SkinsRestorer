@@ -1,8 +1,8 @@
 name: SkinsRestorer
 main: skinsrestorer.bukkit.SkinsRestorer
-version: 10.2
+version: 10.3
 author: _Shevchik_
-depend: [ProtocolLib]
+softdepend: [ProtocolSupport, ProtocolLib]
 load: startup
 commands:
   skinsrestorer:
