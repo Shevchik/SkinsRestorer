@@ -132,6 +132,7 @@ public class SkinProfile implements Cloneable {
 
 	}
 
+	@FunctionalInterface
 	public static interface ApplyFunction {
 
 		public void applySkin(SkinProperty property);

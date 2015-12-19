@@ -21,9 +21,9 @@ import java.lang.reflect.Field;
 
 import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
-import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
+
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -36,14 +36,14 @@ import net.md_5.bungee.event.EventPriority;
 
 public class LoginListener implements Listener {
 
-	private static final Field profileField = getProfileField();
+	protected static final Field profileField = getProfileField();
 	private static Field getProfileField() {
 		try {
 			Field profileField = InitialHandler.class.getDeclaredField("loginProfile"); 
 			profileField.setAccessible(true);
 			return profileField;
 		} catch (Throwable t) {
-			System.err.println("Failed to get method handle for initial handel loginProfile field");
+			System.err.println("Failed to get initial handler loginProfile field");
 			t.printStackTrace();
 		}
 		return null;
@@ -58,16 +58,13 @@ public class LoginListener implements Listener {
 		final String name = event.getConnection().getName();
 		final SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
 		event.registerIntent(SkinsRestorer.getInstance());
-		ProxyServer.getInstance().getScheduler().runAsync(SkinsRestorer.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				try {
-					skinprofile.attemptUpdate();
-				} catch (SkinFetchFailedException e) {
-					SkinsRestorer.getInstance().logInfo("Skin fetch failed for player " + name + ": " + e.getMessage());
-				} finally {
-					event.completeIntent(SkinsRestorer.getInstance());
-				}
+		ProxyServer.getInstance().getScheduler().runAsync(SkinsRestorer.getInstance(), () -> {
+			try {
+				skinprofile.attemptUpdate();
+			} catch (SkinFetchFailedException e) {
+				SkinsRestorer.getInstance().logInfo("Skin fetch failed for player " + name + ": " + e.getMessage());
+			} finally {
+				event.completeIntent(SkinsRestorer.getInstance());
 			}
 		});
 	}
@@ -77,34 +74,31 @@ public class LoginListener implements Listener {
 	public void onPostLogin(final PostLoginEvent event) {
 		String name = event.getPlayer().getName();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(name);
-		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
-			@Override
-			public void applySkin(SkinProperty property) {
-				try {
-					Property textures = new Property(property.getName(), property.getValue(), property.getSignature());
-					InitialHandler handler = (InitialHandler) event.getPlayer().getPendingConnection();
-					LoginResult profile = (LoginResult) profileField.get(handler);
-					if (profile == null) {
-						profile = new LoginResult(event.getPlayer().getUniqueId().toString(), new Property[] { textures });
-					} else {
-						Property[] present = profile.getProperties();
-						boolean alreadyHasSkin = false;
-						for (Property prop : present) {
-							if (prop.getName().equals(textures.getName())) {
-								alreadyHasSkin = true;
-							}
-						}
-						if (!alreadyHasSkin) {
-							Property[] newprops = new Property[present.length + 1];
-							System.arraycopy(present, 0, newprops, 0, present.length);
-							newprops[present.length] = textures;
-							profile.setProperties(newprops);
+		skinprofile.applySkin(property -> {
+			try {
+				Property textures = new Property(property.getName(), property.getValue(), property.getSignature());
+				InitialHandler handler = (InitialHandler) event.getPlayer().getPendingConnection();
+				LoginResult profile = (LoginResult) profileField.get(handler);
+				if (profile == null) {
+					profile = new LoginResult(event.getPlayer().getUniqueId().toString(), new Property[] { textures });
+				} else {
+					Property[] present = profile.getProperties();
+					boolean alreadyHasSkin = false;
+					for (Property prop : present) {
+						if (prop.getName().equals(textures.getName())) {
+							alreadyHasSkin = true;
 						}
 					}
-					profileField.set(handler, profile);
-				} catch (Throwable t) {
-					t.printStackTrace();
+					if (!alreadyHasSkin) {
+						Property[] newprops = new Property[present.length + 1];
+						System.arraycopy(present, 0, newprops, 0, present.length);
+						newprops[present.length] = textures;
+						profile.setProperties(newprops);
+					}
 				}
+				profileField.set(handler, profile);
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
 		});
 	}

@@ -23,8 +23,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import skinsrestorer.libs.com.google.gson.Gson;
 import skinsrestorer.libs.com.google.gson.GsonBuilder;
@@ -44,7 +44,7 @@ public class SkinStorage {
 
 	private static final String cachefile = "cache.json";
 	private static final Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(SkinProfile.class, new SkinProfile.GsonTypeAdapter()).setPrettyPrinting().create();
-	private static final Type type = new TypeToken<ConcurrentHashMap<String, SkinProfile>>(){}.getType();
+	private static final Type type = new TypeToken<Map<String, SkinProfile>>(){}.getType();
 
 	protected static File pluginfolder;
 
@@ -72,9 +72,7 @@ public class SkinStorage {
 	}
 
 	public SkinProfile getOrCreateSkinData(String name) {
-		SkinProfile emptyprofile = new SkinProfile(new Profile(null, name), null, 0, false);
-		SkinProfile profile = skins.putIfAbsent(name.toLowerCase(), emptyprofile);
-		return profile != null ? profile : emptyprofile;
+		return skins.compute(name.toLowerCase(), (playername, profile) -> profile != null ? profile : new SkinProfile(new Profile(null, playername), null, 0, false));
 	}
 
 
@@ -91,14 +89,15 @@ public class SkinStorage {
 	public void saveData() {
 		pluginfolder.mkdirs();
 		try (OutputStreamWriter writer = IOUils.createWriter(new File(pluginfolder, cachefile))) {
-			ConcurrentHashMap<String, SkinProfile> toSerialize = new ConcurrentHashMap<String, SkinProfile>();
-			for (Entry<String, SkinProfile> entry : skins.entrySet()) {
-				if (entry.getValue().shouldSerialize()) {
-					toSerialize.put(entry.getKey(), entry.getValue());
-				}
-			}
-			gson.toJson(toSerialize, type, writer);
+			gson.toJson(
+				skins.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue().shouldSerialize())
+				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue())),
+				type, writer
+			);
 		} catch (JsonIOException | IOException e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -41,11 +41,7 @@ public class CooldownStorage {
 	}
 
 	public boolean isAtCooldown(UUID playeruuid) {
-		Long expire = cooldown.get(playeruuid);
-		if (expire != null) {
-			return expire > System.currentTimeMillis();
-		}
-		return false;
+		return cooldown.getOrDefault(playeruuid, Long.MIN_VALUE) > System.currentTimeMillis();
 	}
 
 	public void resetCooldown(UUID playeruuid) {

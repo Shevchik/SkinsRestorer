@@ -24,13 +24,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-import skinsrestorer.bukkit.SkinsRestorer;
-
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 
+import skinsrestorer.bukkit.SkinsRestorer;
+
 import skinsrestorer.shared.format.SkinProfile;
-import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
@@ -59,14 +58,11 @@ public class LoginListener implements Listener {
 		}
 		final Player player = event.getPlayer();
 		SkinProfile skinprofile = SkinStorage.getInstance().getOrCreateSkinData(player.getName());
-		skinprofile.applySkin(new SkinProfile.ApplyFunction() {
-			@Override
-			public void applySkin(SkinProperty property) {
-				WrappedGameProfile wrappedprofile = WrappedGameProfile.fromPlayer(player);
-				WrappedSignedProperty wrappedproperty = WrappedSignedProperty.fromValues(property.getName(), property.getValue(), property.getSignature());
-				if (!wrappedprofile.getProperties().containsKey(wrappedproperty.getName())) {
-					wrappedprofile.getProperties().put(wrappedproperty.getName(), wrappedproperty);
-				}
+		skinprofile.applySkin(property -> {
+			WrappedGameProfile wrappedprofile = WrappedGameProfile.fromPlayer(player);
+			WrappedSignedProperty wrappedproperty = WrappedSignedProperty.fromValues(property.getName(), property.getValue(), property.getSignature());
+			if (!wrappedprofile.getProperties().containsKey(wrappedproperty.getName())) {
+				wrappedprofile.getProperties().put(wrappedproperty.getName(), wrappedproperty);
 			}
 		});
 	}
