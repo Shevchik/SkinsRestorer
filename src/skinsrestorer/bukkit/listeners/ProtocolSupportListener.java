@@ -23,7 +23,7 @@ public class ProtocolSupportListener implements Listener {
 		}
 		skinprofile.applySkin(property -> {
 			String propertyname = property.getName();
-			if (!event.hasProperty(propertyname)) {
+			if (!event.hasProperty(propertyname) || skinprofile.isForced()) {
 				event.addProperty(new ProfileProperty(propertyname, property.getValue(), property.getSignature()));
 			}
 		}); 

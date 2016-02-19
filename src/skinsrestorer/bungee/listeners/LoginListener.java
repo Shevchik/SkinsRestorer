@@ -84,9 +84,11 @@ public class LoginListener implements Listener {
 				} else {
 					Property[] present = profile.getProperties();
 					boolean alreadyHasSkin = false;
-					for (Property prop : present) {
-						if (prop.getName().equals(textures.getName())) {
-							alreadyHasSkin = true;
+					if (!skinprofile.isForced()) {
+						for (Property prop : present) {
+							if (prop.getName().equals(textures.getName())) {
+								alreadyHasSkin = true;
+							}
 						}
 					}
 					if (!alreadyHasSkin) {
