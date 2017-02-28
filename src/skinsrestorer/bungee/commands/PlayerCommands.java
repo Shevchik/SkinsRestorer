@@ -29,7 +29,6 @@ import skinsrestorer.bungee.SkinsRestorer;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.storage.CooldownStorage;
 import skinsrestorer.shared.storage.LocaleStorage;
-import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
@@ -47,13 +46,27 @@ public class PlayerCommands extends Command {
 			return;
 		}
 		final ProxiedPlayer player = (ProxiedPlayer) sender;
+		if (args.length == 0){
+			TextComponent component = new TextComponent("Use /skin help for help.");
+			component.setColor(ChatColor.BLUE);
+			player.sendMessage(component);
+		} else
+		if ((args.length == 1) && args[0].equalsIgnoreCase("help")){
+			TextComponent component = new TextComponent("]=========[ SkinsRestorer Help ]=========[");
+			component.setColor(ChatColor.BLUE);
+			player.sendMessage(component);
+			TextComponent component2 = new TextComponent("/skin set <PlayerName> - Sets your skin.");
+			component2.setColor(ChatColor.BLUE);
+			player.sendMessage(component2);
+			TextComponent component3 = new TextComponent("/skin clear - Clears your skin data.");
+			component3.setColor(ChatColor.BLUE);
+			player.sendMessage(component3);
+		} else
 		if ((args.length == 1) && args[0].equalsIgnoreCase("clear")) {
-			if (SkinStorage.getInstance().isSkinDataForced(player.getName())) {
-				SkinStorage.getInstance().removeSkinData(player.getName());
-				TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
-				component.setColor(ChatColor.BLUE);
-				player.sendMessage(component);
-			}
+			SkinsRestorer.getInstance().getSkinStorage().removeSkinData(player.getName());
+			TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SKIN_DATA_CLEARED);
+			component.setColor(ChatColor.BLUE);
+			player.sendMessage(component);
 		} else
 		if ((args.length == 2) && args[0].equalsIgnoreCase("set")) {
 			if (CooldownStorage.getInstance().isAtCooldown(player.getUniqueId())) {
@@ -71,7 +84,7 @@ public class PlayerCommands extends Command {
 						String from = args[1];
 						try {
 							SkinProfile skinprofile = SkinFetchUtils.fetchSkinProfile(from, null);
-							SkinStorage.getInstance().setSkinData(player.getName(), skinprofile);
+							SkinsRestorer.getInstance().getSkinStorage().setSkinData(player.getName(), skinprofile);
 							TextComponent component = new TextComponent(LocaleStorage.getInstance().PLAYER_SKIN_CHANGE_SUCCESS);
 							component.setColor(ChatColor.BLUE);
 							player.sendMessage(component);
