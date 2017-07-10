@@ -80,7 +80,7 @@ public class LoginListener implements Listener {
 				InitialHandler handler = (InitialHandler) event.getPlayer().getPendingConnection();
 				LoginResult profile = (LoginResult) profileField.get(handler);
 				if (profile == null) {
-					profile = new LoginResult(event.getPlayer().getUniqueId().toString(), new Property[] { textures });
+					profile = new LoginResult(event.getPlayer().getUniqueId().toString(), name, new Property[] { textures });
 				} else {
 					Property[] present = profile.getProperties();
 					boolean alreadyHasSkin = false;
