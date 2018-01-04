@@ -28,7 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import skinsrestorer.bukkit.commands.AdminCommands;
 import skinsrestorer.bukkit.commands.PlayerCommands;
-import skinsrestorer.bukkit.listeners.DefaultLoginListener;
+import skinsrestorer.bukkit.listeners.LoginListener;
 import skinsrestorer.bukkit.listeners.ProtocolSupportListener;
 import skinsrestorer.shared.storage.CooldownStorage;
 import skinsrestorer.shared.storage.LocaleStorage;
@@ -60,7 +60,7 @@ public class SkinsRestorer extends JavaPlugin implements Listener {
 		if (pm.isPluginEnabled("ProtocolSupport")) {
 			pm.registerEvents(new ProtocolSupportListener(), this);
 		} else if (pm.isPluginEnabled("ProtocolLib")) {
-			pm.registerEvents(new DefaultLoginListener(), this);
+			pm.registerEvents(new LoginListener(), this);
 		} else {
 			throw new RuntimeException("You need either ProtocolSupport or ProtocolLib for this plugin to function");
 		}

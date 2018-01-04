@@ -1,4 +1,5 @@
 name: SkinsRestorer
 main: skinsrestorer.bungee.SkinsRestorer
-version: 10.3
+version: 11.0
 author: _Shevchik_
+softdepends: [ProtocolSupport]

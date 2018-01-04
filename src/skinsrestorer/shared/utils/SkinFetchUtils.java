@@ -19,7 +19,7 @@ package skinsrestorer.shared.utils;
 
 import java.util.UUID;
 
-import skinsrestorer.libs.org.json.simple.parser.ParseException;
+import skinsrestorer.libs.com.google.gson.JsonSyntaxException;
 import skinsrestorer.shared.format.Profile;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.storage.LocaleStorage;
@@ -39,7 +39,7 @@ public class SkinFetchUtils {
 			}
 			Profile profile = MojangAPI.getProfile(name);
 			return MojangAPI.getSkinProfile(profile.getId());
-		} catch (ParseException e) {
+		} catch (JsonSyntaxException e) {
 			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.SKIN_RECODE_FAILED);
 		} catch (SkinFetchFailedException sffe) {
 			throw sffe;

@@ -33,7 +33,7 @@ import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.storage.SkinStorage;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
 
-public class DefaultLoginListener implements Listener {
+public class LoginListener implements Listener {
 
 	//load skin data on async prelogin event
 	@EventHandler(priority = EventPriority.HIGHEST)

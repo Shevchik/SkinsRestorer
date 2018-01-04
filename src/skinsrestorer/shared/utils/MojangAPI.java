@@ -17,56 +17,61 @@
 
 package skinsrestorer.shared.utils;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.stream.Collectors;
 
-import skinsrestorer.libs.org.json.simple.JSONArray;
-import skinsrestorer.libs.org.json.simple.JSONObject;
-import skinsrestorer.libs.org.json.simple.parser.JSONParser;
-import skinsrestorer.libs.org.json.simple.parser.ParseException;
+import skinsrestorer.libs.com.google.gson.Gson;
+import skinsrestorer.libs.com.google.gson.JsonArray;
+import skinsrestorer.libs.com.google.gson.JsonObject;
+import skinsrestorer.libs.com.google.gson.JsonPrimitive;
+import skinsrestorer.libs.com.google.gson.JsonSyntaxException;
 import skinsrestorer.shared.format.Profile;
 import skinsrestorer.shared.format.SkinProfile;
 import skinsrestorer.shared.format.SkinProperty;
 import skinsrestorer.shared.utils.SkinFetchUtils.SkinFetchFailedException;
-import skinsrestorer.shared.utils.apacheutils.IOUtils;
 
 public class MojangAPI {
 
+	private static final Gson gson = new Gson();
+
 	private static final String profileurl = "https://api.mojang.com/profiles/minecraft";
-	public static Profile getProfile(String nick) throws SkinFetchFailedException, IOException, ParseException {
+	public static Profile getProfile(String nick) throws SkinFetchFailedException, IOException, JsonSyntaxException {
 		//open connection
 		HttpURLConnection connection = (HttpURLConnection) setupConnection(new URL(profileurl));
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Content-Type", "application/json");
 		//write body
-		DataOutputStream writer = new DataOutputStream(connection.getOutputStream());
-		writer.write(JSONArray.toJSONString(Arrays.asList(nick)).getBytes(StandardCharsets.UTF_8));
-		writer.flush();
-		writer.close();
+		try (DataOutputStream writer = new DataOutputStream(connection.getOutputStream())) {
+			JsonArray names = new JsonArray();
+			names.add(new JsonPrimitive(nick));
+			writer.write(gson.toJson(names).getBytes(StandardCharsets.UTF_8));
+		}
 		//check response code
 		if (connection.getResponseCode() == 429) {
 			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.RATE_LIMITED);
 		}
 		//read response
-		InputStream is = connection.getInputStream();
-		String result = IOUtils.toString(is, StandardCharsets.UTF_8);
-		IOUtils.closeQuietly(is);
-		JSONArray jsonProfiles = (JSONArray) new JSONParser().parse(result);
-		if (jsonProfiles.size() > 0) {
-			JSONObject jsonProfile = (JSONObject) jsonProfiles.get(0);
-			return new Profile((String) jsonProfile.get("id"), (String) jsonProfile.get("name"));
+		try (InputStream is = connection.getInputStream()) {
+			String result = readStreamToString(is);
+			JsonArray jsonProfiles = gson.fromJson(result, JsonArray.class);
+			if (jsonProfiles.size() > 0) {
+				JsonObject jsonProfile = (JsonObject) jsonProfiles.get(0).getAsJsonObject();
+				return new Profile(jsonProfile.get("id").getAsString(), jsonProfile.get("name").getAsString());
+			}
+			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_PREMIUM_PLAYER);
 		}
-		throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_PREMIUM_PLAYER);
 	}
 
 	private static final String skullbloburl = "https://sessionserver.mojang.com/session/minecraft/profile/";
-	public static SkinProfile getSkinProfile(String id) throws IOException, ParseException, SkinFetchFailedException {
+	public static SkinProfile getSkinProfile(String id) throws IOException, JsonSyntaxException, SkinFetchFailedException {
 		//open connection
 		HttpURLConnection connection =  (HttpURLConnection) setupConnection(new URL(skullbloburl+id.replace("-", "")+"?unsigned=false"));
 		//check response code
@@ -74,22 +79,22 @@ public class MojangAPI {
 			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.RATE_LIMITED);
 		}
 		//read response
-		InputStream is = connection.getInputStream();
-		String result = IOUtils.toString(is, StandardCharsets.UTF_8);
-		IOUtils.closeQuietly(is);
-		JSONObject obj = (JSONObject) new JSONParser().parse(result);
-		String username = (String) obj.get("name");
-		JSONArray properties = (JSONArray) (obj).get("properties");
-		for (int i = 0; i < properties.size(); i++) {
-			JSONObject property = (JSONObject) properties.get(i);
-			String name = (String) property.get("name");
-			String value = (String) property.get("value");
-			String signature = (String) property.get("signature");
-			if (name.equals("textures")) {
-				return new SkinProfile(new Profile(id, username), new SkinProperty(name, value, signature), System.currentTimeMillis(), false);
+		try (InputStream is = connection.getInputStream()) {
+			String result = readStreamToString(is);
+			JsonObject obj = gson.fromJson(result, JsonObject.class);
+			String username = obj.get("name").getAsString();
+			JsonArray properties = obj.get("properties").getAsJsonArray();
+			for (int i = 0; i < properties.size(); i++) {
+				JsonObject property = properties.get(i).getAsJsonObject();
+				String name = property.get("name").getAsString();
+				String value = property.get("value").getAsString();
+				String signature = property.get("signature").getAsString();
+				if (name.equals("textures")) {
+					return new SkinProfile(new Profile(id, username), new SkinProperty(name, value, signature), System.currentTimeMillis(), false);
+				}
 			}
+			throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_SKIN_DATA);
 		}
-		throw new SkinFetchFailedException(SkinFetchFailedException.Reason.NO_SKIN_DATA);
 	}
 
 	private static URLConnection setupConnection(URL url) throws IOException {
@@ -100,6 +105,10 @@ public class MojangAPI {
 		connection.setDoInput(true);
 		connection.setDoOutput(true);
 		return connection;
+	}
+
+	private static String readStreamToString(InputStream is) {
+		return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
 	}
 
 }

@@ -23,10 +23,12 @@ import java.util.logging.Logger;
 import skinsrestorer.bungee.commands.AdminCommands;
 import skinsrestorer.bungee.commands.PlayerCommands;
 import skinsrestorer.bungee.listeners.LoginListener;
+import skinsrestorer.bungee.listeners.ProtocolSupportListener;
 import skinsrestorer.shared.storage.CooldownStorage;
 import skinsrestorer.shared.storage.LocaleStorage;
 import skinsrestorer.shared.storage.SkinStorage;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginManager;
 
 public class SkinsRestorer extends Plugin {
 
@@ -46,10 +48,15 @@ public class SkinsRestorer extends Plugin {
 		log = getLogger();
 		LocaleStorage.init(getDataFolder());
 		SkinStorage.init(getDataFolder());
-		this.getProxy().getPluginManager().registerListener(this, new LoginListener());
-		this.getProxy().getPluginManager().registerCommand(this, new AdminCommands());
-		this.getProxy().getPluginManager().registerCommand(this, new PlayerCommands());
-		this.getProxy().getScheduler().schedule(this, CooldownStorage.cleanupCooldowns, 0, 1, TimeUnit.MINUTES);
+		PluginManager pm = getProxy().getPluginManager();
+		if (pm.getPlugin("ProtocolSupportBungee") != null) {
+			pm.registerListener(this, new ProtocolSupportListener());
+		} else {
+			pm.registerListener(this, new LoginListener());
+		}
+		pm.registerCommand(this, new AdminCommands());
+		pm.registerCommand(this, new PlayerCommands());
+		getProxy().getScheduler().schedule(this, CooldownStorage.cleanupCooldowns, 0, 1, TimeUnit.MINUTES);
 	}
 
 	@Override
